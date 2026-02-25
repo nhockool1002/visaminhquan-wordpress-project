@@ -1,0 +1,307 @@
+/**
+ * Carousel Post Styles
+ * Updated to prevent item cutoff
+ */
+
+.nhut-carousel-post-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 20px 0 40px 0;
+    padding: 0 60px;
+    box-sizing: border-box;
+}
+
+.nhut-carousel-post-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.nhut-carousel-post-slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    gap: 20px;
+    will-change: transform;
+    margin-bottom: 30px;
+}
+
+.nhut-carousel-post-item {
+    flex: 0 0 auto;
+    width: calc((100% - 60px) / 4); /* Default 4 columns with gaps */
+    min-width: 280px;
+    box-sizing: border-box;
+}
+
+/* Responsive columns */
+.nhut-carousel-post-wrapper[data-columns="1"] .nhut-carousel-post-item {
+    width: 100%;
+}
+
+.nhut-carousel-post-wrapper[data-columns="2"] .nhut-carousel-post-item {
+    width: calc((100% - 20px) / 2);
+}
+
+.nhut-carousel-post-wrapper[data-columns="3"] .nhut-carousel-post-item {
+    width: calc((100% - 40px) / 3);
+}
+
+.nhut-carousel-post-wrapper[data-columns="4"] .nhut-carousel-post-item {
+    width: calc((100% - 60px) / 4);
+}
+
+.nhut-carousel-post-wrapper[data-columns="5"] .nhut-carousel-post-item {
+    width: calc((100% - 80px) / 5);
+}
+
+.nhut-carousel-post-wrapper[data-columns="6"] .nhut-carousel-post-item {
+    width: calc((100% - 100px) / 6);
+}
+
+/* Card styling */
+.nhut-carousel-post-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.nhut-carousel-post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.nhut-carousel-post-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.nhut-carousel-post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.nhut-carousel-post-card:hover .nhut-carousel-post-image img {
+    transform: scale(1.05);
+}
+
+.nhut-carousel-post-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.nhut-carousel-post-content {
+    padding: 20px;
+    padding-bottom: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    min-height: 0; /* Allow content to shrink */
+}
+
+.nhut-carousel-post-title {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.nhut-carousel-post-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: block;
+}
+
+.nhut-carousel-post-title a:hover {
+    color: #0056A4;
+}
+
+.nhut-carousel-post-read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #0056A4;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.nhut-carousel-post-read-more:hover {
+    gap: 12px;
+    opacity: 0.8;
+}
+
+.nhut-carousel-post-read-more span {
+    display: inline-block;
+}
+
+.nhut-carousel-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.nhut-carousel-post-read-more:hover .nhut-carousel-icon {
+    transform: translateX(3px);
+}
+
+/* Navigation arrows */
+.nhut-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.nhut-carousel-nav:hover:not(.disabled) {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.nhut-carousel-nav:active:not(.disabled) {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.nhut-carousel-nav svg {
+    width: 24px;
+    height: 24px;
+    color: #0056A4;
+    display: block;
+}
+
+.nhut-carousel-prev {
+    left: 0;
+}
+
+.nhut-carousel-next {
+    right: 0;
+}
+
+.nhut-carousel-nav.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .nhut-carousel-post-wrapper[data-columns="4"] .nhut-carousel-post-item,
+    .nhut-carousel-post-wrapper[data-columns="5"] .nhut-carousel-post-item,
+    .nhut-carousel-post-wrapper[data-columns="6"] .nhut-carousel-post-item {
+        width: calc((100% - 40px) / 3);
+    }
+}
+
+@media (max-width: 992px) {
+    .nhut-carousel-post-wrapper {
+        padding: 0 50px;
+    }
+    
+    .nhut-carousel-post-wrapper[data-columns="3"] .nhut-carousel-post-item,
+    .nhut-carousel-post-wrapper[data-columns="4"] .nhut-carousel-post-item,
+    .nhut-carousel-post-wrapper[data-columns="5"] .nhut-carousel-post-item,
+    .nhut-carousel-post-wrapper[data-columns="6"] .nhut-carousel-post-item {
+        width: calc((100% - 20px) / 2);
+    }
+    
+    .nhut-carousel-prev {
+        left: 0;
+    }
+    
+    .nhut-carousel-next {
+        right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .nhut-carousel-post-wrapper {
+        padding: 0 40px;
+    }
+    
+    .nhut-carousel-post-item {
+        width: calc((100% - 20px) / 2) !important;
+        min-width: 250px;
+    }
+    
+    .nhut-carousel-post-image {
+        height: 180px;
+    }
+    
+    .nhut-carousel-post-content {
+        padding: 15px;
+    }
+    
+    .nhut-carousel-post-title {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .nhut-carousel-post-wrapper {
+        padding: 0 35px;
+        margin-bottom: 30px;
+    }
+    
+    .nhut-carousel-post-item {
+        width: 100% !important;
+        min-width: 100%;
+    }
+    
+    .nhut-carousel-post-image {
+        height: 200px;
+    }
+    
+    .nhut-carousel-nav {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .nhut-carousel-nav svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .nhut-carousel-prev {
+        left: 0;
+    }
+    
+    .nhut-carousel-next {
+        right: 0;
+    }
+}

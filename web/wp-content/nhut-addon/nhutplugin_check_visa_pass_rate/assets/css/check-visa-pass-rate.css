@@ -1,0 +1,339 @@
+/**
+ * Check Visa Pass Rate Form Styles
+ */
+
+.nhut-visa-form-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #0056A4;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.nhut-visa-form-container {
+    width: 100%;
+}
+
+.nhut-visa-form-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0 0 30px 0;
+    letter-spacing: 0.5px;
+}
+
+/* Progress Indicator */
+.nhut-visa-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    gap: 8px;
+}
+
+.nhut-progress-step {
+    position: relative;
+}
+
+.nhut-progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.nhut-progress-step.nhut-step-active .nhut-progress-circle {
+    background: #0056A4;
+    border-color: #0056A4;
+    color: #ffffff;
+}
+
+.nhut-progress-step:not(.nhut-step-active):not(.nhut-step-completed) .nhut-progress-circle {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.nhut-progress-step.nhut-step-completed .nhut-progress-circle {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.nhut-progress-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    max-width: 60px;
+    transition: background 0.3s ease;
+}
+
+.nhut-progress-step.nhut-step-completed + .nhut-progress-line {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Form Steps */
+.nhut-form-step {
+    display: none;
+}
+
+.nhut-form-step.nhut-step-active {
+    display: block;
+}
+
+.nhut-form-field {
+    margin-bottom: 25px;
+}
+
+.nhut-form-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.nhut-required {
+    color: #ff0000;
+    margin-left: 3px;
+}
+
+/* Select Dropdown */
+.nhut-select-wrapper {
+    position: relative;
+}
+
+.nhut-form-select {
+    width: 100%;
+    height: 50px;
+    padding: 0 40px 0 20px;
+    background: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333333;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.nhut-form-select:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.nhut-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #333333;
+    pointer-events: none;
+}
+
+/* Input Fields */
+.nhut-form-input {
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    background: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333333;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.nhut-form-input:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.nhut-form-input::placeholder {
+    color: #999999;
+}
+
+/* Captcha */
+.nhut-captcha-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nhut-captcha-question {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.nhut-captcha-input {
+    flex: 1;
+    background: #f2b533;
+    color: #333333;
+    font-weight: 600;
+    min-width: 150px;
+}
+
+.nhut-captcha-input::placeholder {
+    color: #666666;
+}
+
+/* Buttons */
+.nhut-form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: space-between;
+}
+
+.nhut-btn {
+    flex: 1;
+    height: 50px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.nhut-btn-back {
+    background: #6c757d;
+    color: #ffffff;
+}
+
+.nhut-btn-back:hover {
+    background: #5a6268;
+}
+
+.nhut-btn-next,
+.nhut-btn-submit {
+    background: #f2b533;
+    color: #ffffff;
+}
+
+.nhut-btn-next:hover,
+.nhut-btn-submit:hover {
+    background: #e0a522;
+}
+
+.nhut-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Social Icons */
+.nhut-form-social {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.nhut-social-link {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.nhut-social-link:hover {
+    transform: scale(1.1);
+}
+
+.nhut-social-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nhut-visa-form-wrapper {
+        padding: 30px 15px;
+    }
+    
+    .nhut-visa-form-title {
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .nhut-progress-circle {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .nhut-progress-line {
+        max-width: 40px;
+    }
+    
+    .nhut-form-label {
+        font-size: 14px;
+    }
+    
+    .nhut-form-select,
+    .nhut-form-input {
+        height: 45px;
+        font-size: 14px;
+    }
+    
+    .nhut-btn {
+        height: 45px;
+        font-size: 14px;
+    }
+    
+    .nhut-captcha-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .nhut-captcha-input {
+        width: 100%;
+    }
+}
+
+/* Loading State */
+.nhut-form-submitting .nhut-btn-submit {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.nhut-form-submitting .nhut-btn-submit::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+

@@ -1,0 +1,40 @@
+.DS_Store
+Thumbs.db
+
+# DDEV & local dev
+.ddev/
+deploy-output/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Composer / PHP
+vendor/
+composer.lock
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# OS / cache
+__MACOSX/
+
+# WordPress uploads & cache (không commit media)
+web/wp-content/uploads/
+web/wp-content/cache/
+web/wp-content/upgrade/
+
+# Env / secrets
+.env
+.env.*
+

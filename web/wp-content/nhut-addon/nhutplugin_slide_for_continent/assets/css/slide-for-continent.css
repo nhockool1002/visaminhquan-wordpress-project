@@ -1,0 +1,423 @@
+/**
+ * Slide for Continent - Bootstrap 5 Carousel Styles
+ * Fully Responsive
+ */
+
+.nhut-continent-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 40px 0;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Header Section */
+.nhut-continent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.nhut-continent-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1b2b3a;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.nhut-continent-view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #6c5ce7;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.nhut-continent-view-all:hover {
+    gap: 12px;
+    opacity: 0.8;
+    color: #6c5ce7;
+}
+
+.nhut-continent-view-all svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.nhut-continent-view-all:hover svg {
+    transform: translateX(3px);
+}
+
+/* Bootstrap Carousel Container */
+.nhut-continent-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 0 50px;
+    box-sizing: border-box;
+}
+
+.nhut-continent-carousel .carousel-inner {
+    overflow: visible;
+    width: 100%;
+}
+
+.nhut-continent-carousel .carousel-item {
+    transition: transform 0.6s ease-in-out;
+}
+
+.nhut-continent-carousel .carousel-item.active {
+    display: block;
+}
+
+/* Card styling */
+.nhut-continent-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.nhut-continent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.nhut-continent-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background: #f5f5f5;
+}
+
+.nhut-continent-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.nhut-continent-card:hover .nhut-continent-image img {
+    transform: scale(1.05);
+}
+
+.nhut-continent-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Category Tag */
+.nhut-continent-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(27, 43, 58, 0.85);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 10;
+    line-height: 1.2;
+}
+
+.nhut-continent-content {
+    padding: 20px;
+    padding-bottom: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+.nhut-continent-post-title {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    min-height: 50px;
+}
+
+.nhut-continent-post-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: block;
+}
+
+.nhut-continent-post-title a:hover {
+    color: #0056A4;
+}
+
+.nhut-continent-contact {
+    display: inline-block;
+    color: #0056A4;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: opacity 0.3s ease;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.nhut-continent-contact:hover {
+    opacity: 0.8;
+    color: #0056A4;
+}
+
+/* Bootstrap Carousel Navigation - Custom Styling */
+.nhut-continent-carousel .carousel-control-prev,
+.nhut-continent-carousel .carousel-control-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
+    opacity: 1;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nhut-continent-carousel .carousel-control-prev {
+    left: 0;
+}
+
+.nhut-continent-carousel .carousel-control-next {
+    right: 0;
+}
+
+.nhut-continent-carousel .carousel-control-prev:hover,
+.nhut-continent-carousel .carousel-control-next:hover {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.nhut-continent-carousel .carousel-control-prev:active,
+.nhut-continent-carousel .carousel-control-next:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.nhut-continent-carousel .carousel-control-prev-icon,
+.nhut-continent-carousel .carousel-control-next-icon {
+    width: 24px;
+    height: 24px;
+    background-color: #0056A4;
+    border-radius: 50%;
+    background-size: 60% 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.nhut-continent-carousel .carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+.nhut-continent-carousel .carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.nhut-continent-carousel .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Responsive design */
+@media (max-width: 1400px) {
+    .nhut-continent-carousel-wrapper {
+        padding: 0 10px;
+    }
+    
+    .nhut-continent-carousel {
+        padding: 0 50px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .nhut-continent-carousel-wrapper {
+        padding: 0 10px;
+    }
+    
+    .nhut-continent-carousel {
+        padding: 0 50px;
+    }
+    
+    .nhut-continent-title {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 992px) {
+    .nhut-continent-carousel-wrapper {
+        padding: 0 10px;
+    }
+    
+    .nhut-continent-carousel {
+        padding: 0 50px;
+    }
+    
+    .nhut-continent-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .nhut-continent-title {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nhut-continent-carousel-wrapper {
+        padding: 0 5px;
+        margin: 30px 0;
+    }
+    
+    .nhut-continent-carousel {
+        padding: 0 45px;
+    }
+    
+    .nhut-continent-title {
+        font-size: 24px;
+    }
+    
+    .nhut-continent-image {
+        height: 180px;
+    }
+    
+    .nhut-continent-content {
+        padding: 15px;
+    }
+    
+    .nhut-continent-post-title {
+        font-size: 16px;
+        min-height: 45px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev,
+    .nhut-continent-carousel .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev-icon,
+    .nhut-continent-carousel .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .nhut-continent-carousel-wrapper {
+        padding: 0 5px;
+        margin: 20px 0;
+    }
+    
+    .nhut-continent-carousel {
+        padding: 0 40px;
+    }
+    
+    .nhut-continent-header {
+        margin-bottom: 20px;
+    }
+    
+    .nhut-continent-title {
+        font-size: 20px;
+    }
+    
+    .nhut-continent-view-all {
+        font-size: 14px;
+    }
+    
+    .nhut-continent-image {
+        height: 200px;
+    }
+    
+    .nhut-continent-content {
+        padding: 15px;
+    }
+    
+    .nhut-continent-post-title {
+        font-size: 16px;
+        min-height: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev,
+    .nhut-continent-carousel .carousel-control-next {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev-icon,
+    .nhut-continent-carousel .carousel-control-next-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev {
+        left: 5px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-next {
+        right: 5px;
+    }
+}
+
+@media (max-width: 400px) {
+    .nhut-continent-carousel {
+        padding: 0 35px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev,
+    .nhut-continent-carousel .carousel-control-next {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .nhut-continent-carousel .carousel-control-prev-icon,
+    .nhut-continent-carousel .carousel-control-next-icon {
+        width: 16px;
+        height: 16px;
+    }
+}

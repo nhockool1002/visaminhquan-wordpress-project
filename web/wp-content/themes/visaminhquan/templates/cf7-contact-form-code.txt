@@ -1,0 +1,35 @@
+============================================
+CODE DÁN VÀO CONTACT FORM 7 (phần Form)
+============================================
+Vào: WordPress Admin > Contact > Contact Forms > Chỉnh sửa form (hoặc Thêm mới)
+Dán toàn bộ block dưới đây vào ô "Form".
+
+--------------------------------------------
+
+[text* your-name class:vmq-cf7-name placeholder "Họ và tên của bạn"]
+[tel* your-phone class:vmq-cf7-phone placeholder "Số điện thoại của bạn"]
+[email* your-email class:vmq-cf7-email placeholder "Email của bạn"]
+[text visa-country class:vmq-cf7-country placeholder "Bạn muốn xin Visa nước nào?"]
+[select visa-type class:vmq-cf7-visa-type first_as_label "Bạn cần xin loại visa nào?" "Thăm thân" "Du lịch" "Định cư"]
+[submit class:vmq-cf7-submit "GỬI"]
+
+--------------------------------------------
+
+Class dùng để custom CSS (trong .vmq-cf7-contact-mau):
+  .vmq-cf7-name    - Họ và tên
+  .vmq-cf7-phone   - Số điện thoại
+  .vmq-cf7-email   - Email
+  .vmq-cf7-country - Visa nước nào
+  .vmq-cf7-visa-type - Loại visa (select)
+  .vmq-cf7-submit  - Nút GỬI
+
+--------------------------------------------
+
+Lưu form (Save). Copy ID form (số, ví dụ 123) và thay vào shortcode trong elementor-contact-section.html:
+
+[contact-form-7 id="123" title="Contact form liên hệ"]
+
+============================================
+Lưu ý: CF7 dùng tag [text], [tel], [select]...
+không phải HTML <input>. Chỉ cần dán đúng block trên.
+============================================
