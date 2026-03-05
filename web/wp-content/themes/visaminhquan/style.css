@@ -21,18 +21,102 @@ Tags: custom-menu, custom-logo, featured-images, threaded-comments, translation-
     box-sizing: border-box;
 }
 
-/* Import UTM Avo font (giữ cho footer) */
+/* Import UTM Avo font (giữ cho footer) - local woff2, đặt trực tiếp trong assets/font */
 @font-face {
     font-family: 'UTM Avo';
-    src: url('assets/font/utm-avo.ttf') format('truetype');
+    src: url('/wp-content/themes/visaminhquan/assets/font/utm-avo.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Local Manrope font (thay cho Google Fonts) - tất cả file nằm trong assets/font */
+@font-face {
+    font-family: 'Manrope';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Manrope-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
+    font-family: 'Manrope';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Manrope-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Manrope-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Manrope-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Manrope-ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Local Roboto - tất cả file nằm trong assets/font */
+@font-face {
+    font-family: 'Roboto';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Roboto-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Roboto-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/wp-content/themes/visaminhquan/assets/font/Roboto-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Local Roboto Slab - tất cả file nằm trong assets/font */
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url('/wp-content/themes/visaminhquan/assets/font/RobotoSlab-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url('/wp-content/themes/visaminhquan/assets/font/RobotoSlab-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* UTM Avo bold - trong assets/font */
+@font-face {
     font-family: 'UTM Avo';
-    src: url('assets/font/utm-avobold.ttf') format('truetype');
+    src: url('/wp-content/themes/visaminhquan/assets/font/utm-avobold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -151,8 +235,17 @@ body {
 
 @media (max-width: 640px) {
     .vmq-top-contact-inner {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .vmq-top-contact-left,
+    .vmq-top-contact-right {
+        flex-wrap: nowrap;
+        white-space: nowrap;
     }
 }
 
@@ -636,13 +729,13 @@ body {
     align-self: start;
 }
 
-/* Thứ tự: Âu - Á - Mỹ - Úc - Phi */
-.main-navigation ul ul > li.menu-item-chau-au {
-    grid-column: 1 / span 2;
+/* Thứ tự hiển thị: Á - Âu - Mỹ - Úc - Phi */
+.main-navigation ul ul > li.menu-item-chau-a {
+    grid-column: 1;
     grid-row: 1;
 }
-.main-navigation ul ul > li.menu-item-chau-a {
-    grid-column: 3;
+.main-navigation ul ul > li.menu-item-chau-au {
+    grid-column: 2 / span 2;
     grid-row: 1;
 }
 .main-navigation ul ul > li.menu-item-chau-my {
@@ -1063,8 +1156,8 @@ body {
 
 .vmq-post-author-avatar {
     flex-shrink: 0;
-    width: 72px;
-    height: 72px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     overflow: hidden;
     background: #e2e8f0;
@@ -1586,7 +1679,7 @@ body {
     .main-navigation {
         order: 3;
         flex: 1 1 100%;
-        display: none;
+        display: none; /* Ẩn nav gốc trên mobile, chỉ dùng cho desktop & dữ liệu Hamburger V2 */
         position: absolute;
         top: 100%;
         left: 0;
@@ -1718,6 +1811,270 @@ body {
         transform: none !important;
         background-color: #f0f0f0;
     }
+
+    /* ============================================
+       Mobile Hamburger V2 - Vertical Icon Tabs
+       ============================================ */
+    .vmq-mobile-menu {
+        position: fixed;
+        inset: 0;
+        z-index: 1001;
+        display: none;
+    }
+
+    .vmq-mobile-menu.is-open {
+        display: block;
+    }
+
+    .vmq-mobile-menu-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+    }
+
+    .vmq-mobile-menu-panel {
+        position: absolute;
+        top: 6vh;
+        bottom: 4vh;
+        left: 8px;
+        right: 8px;
+        max-height: 90vh;
+        background: #ffffff;
+        border-radius: 18px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+    }
+
+    .vmq-mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px 8px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .vmq-mobile-menu-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0b1c44;
+    }
+
+    .vmq-mobile-menu-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .vmq-mobile-menu-close span {
+        position: absolute;
+        width: 16px;
+        height: 2px;
+        background: #0b1c44;
+        border-radius: 999px;
+    }
+
+    .vmq-mobile-menu-close span:first-child {
+        transform: rotate(45deg);
+    }
+
+    .vmq-mobile-menu-close span:last-child {
+        transform: rotate(-45deg);
+    }
+
+    .vmq-mobile-menu-inner {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+    }
+
+    .vmq-mobile-menu-tabs {
+        width: 96px;
+        background: #f5f7fb;
+        border-right: 1px solid #e2e8f0;
+        padding: 12px 8px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .vmq-mobile-tab {
+        border: none;
+        background: #e2e8f0;
+        color: #0b1c44;
+        border-radius: 10px;
+        padding: 10px 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .vmq-mobile-tab.active {
+        background: #0b1c44;
+        color: #ffffff;
+    }
+
+    .vmq-mobile-tab-label {
+        display: block;
+    }
+
+    .vmq-mobile-menu-content {
+        flex: 1;
+        padding: 12px 16px 20px;
+        overflow-y: auto;
+    }
+
+    .vmq-mobile-panel {
+        display: none;
+    }
+
+    .vmq-mobile-panel.active {
+        display: block;
+    }
+
+    .vmq-mobile-submenu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .vmq-mobile-submenu > li > a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #0b1c44;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .vmq-mobile-submenu > li > a:hover {
+        background: #f3f4ff;
+        color: #001776;
+    }
+
+    /* Accordion trong phần nội dung bên phải */
+    .vmq-mobile-accordion {
+        border-radius: 10px;
+        background: #f9fafb;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .vmq-mobile-acc-header {
+        width: 100%;
+        border: none;
+        background: transparent;
+        padding: 10px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #0b1c44;
+    }
+
+    .vmq-mobile-acc-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 1px solid #cbd5f5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .vmq-mobile-acc-icon::before,
+    .vmq-mobile-acc-icon::after {
+        content: '';
+        position: absolute;
+        background: #4b5563;
+        border-radius: 999px;
+    }
+
+    .vmq-mobile-acc-icon::before {
+        width: 8px;
+        height: 2px;
+    }
+
+    .vmq-mobile-acc-icon::after {
+        width: 2px;
+        height: 8px;
+        transition: transform 0.2s ease;
+    }
+
+    .vmq-mobile-accordion.is-open .vmq-mobile-acc-icon::after {
+        opacity: 0; /* khi mở: chỉ còn dấu '-' thay vì 'X' */
+    }
+
+    .vmq-mobile-acc-panel {
+        padding: 0 4px 8px 10px;
+    }
+
+    /* Xử lý list con trong accordion (đặc biệt cho menu Dịch vụ khác) */
+    .vmq-mobile-acc-panel ul {
+        list-style: none;
+        margin: 0;
+        padding-left: 0;
+    }
+
+    .vmq-mobile-acc-panel ul li {
+        margin: 2px 0;
+        display: block;
+    }
+
+    .vmq-mobile-acc-panel ul li a {
+        display: block;
+        padding: 4px 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: normal;
+        text-decoration: none;
+        color: #0b1c44;
+        border-radius: 6px;
+    }
+    
+    .vmq-mobile-acc-panel ul li a:hover {
+        background-color: #eef2ff;
+        color: #001776;
+    }
+    
+    /* Reset link style & pseudo bullets trong mobile menu */
+    .vmq-mobile-menu .vmq-mobile-panel a {
+        text-decoration: none;
+        color: #0b1c44;
+    }
+
+    .vmq-mobile-menu .vmq-mobile-panel a:visited {
+        color: #0b1c44;
+    }
+
+    .vmq-mobile-menu .vmq-mobile-panel a:hover {
+        color: #001776;
+    }
+
+    .vmq-mobile-menu .vmq-mobile-panel a::before,
+    .vmq-mobile-menu .vmq-mobile-panel a::after {
+        content: none !important;
+    }
     
     .header-right {
         flex: 1 1 auto;
@@ -1769,6 +2126,17 @@ body {
     
     .entry-title {
         font-size: 1.5rem;
+    }
+}
+
+/* Đảm bảo menu mobile KHÔNG hiển thị trên PC */
+@media (min-width: 993px) {
+    .vmq-mobile-menu {
+        display: none !important;
+    }
+
+    .mobile-menu-toggle {
+        display: none !important;
     }
 }
 

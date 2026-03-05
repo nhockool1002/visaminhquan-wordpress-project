@@ -2,18 +2,20 @@
 /**
  * Slide for Continent - Carousel Bài viết Visa theo châu lục
  * Using Bootstrap 5 Carousel - Fully Responsive
- * 
- * Shortcodes:
+ * * Shortcodes:
  * - [nhut_slide_asia] - Châu Á
  * - [nhut_slide_europe] - Châu Âu
  * - [nhut_slide_africa] - Châu Phi
  * - [nhut_slide_america] - Châu Mỹ
  * - [nhut_slide_oceania] - Châu Úc
- * 
- * Attributes:
- * - posts_per_page: Số lượng bài viết hiển thị (mặc định: 4)
+ * - [nhut_slide_custom] - Tuỳ chỉnh (VD: [nhut_slide_custom cat="1,2,3" goto="6" title="Tên tuỳ chọn"])
+ * * Attributes:
+ * - posts_per_page: Số lượng bài viết hiển thị trên 1 slide (mặc định: 4)
  * - total_posts: Tổng số bài viết load từ category (mặc định: 10)
  * - show_all_text: Text nút "Xem tất cả" (mặc định: "Xem tất cả")
+ * - cat: (Chỉ dùng cho custom) Danh sách ID category lấy bài viết
+ * - goto: (Chỉ dùng cho custom) ID category khi nhấn Xem tất cả
+ * - title: (Chỉ dùng cho custom) Tiêu đề của khối slide
  */
 
 if (!defined('ABSPATH')) {
@@ -47,6 +49,11 @@ class Nhut_Slide_For_Continent {
         add_shortcode('nhut_slide_africa', array($this, 'render_africa'));
         add_shortcode('nhut_slide_america', array($this, 'render_america'));
         add_shortcode('nhut_slide_oceania', array($this, 'render_oceania'));
+        
+        // Thêm shortcode custom mới
+        add_shortcode('nhut_slide_custom', array($this, 'render_custom'));
+        // Alias phòng trường hợp gõ nhầm chữ "custome"
+        add_shortcode('nhut_slide_custome', array($this, 'render_custom'));
     }
     
     /**
@@ -95,7 +102,7 @@ class Nhut_Slide_For_Continent {
     }
     
     /**
-     * Render carousel cho châu lục
+     * Render carousel cho châu lục và Custom
      */
     private function render_continent_carousel($continent_key, $atts) {
         $this->load_assets();
@@ -103,54 +110,87 @@ class Nhut_Slide_For_Continent {
         // Parse attributes
         $atts = shortcode_atts(array(
             'posts_per_page' => 4,
-            'total_posts' => 10,
-            'show_all_text' => 'Xem tất cả'
+            'total_posts'    => 10,
+            'show_all_text'  => 'Xem tất cả',
+            'cat'            => '', // Dành cho custom
+            'goto'           => '', // Dành cho custom
+            'title'          => ''  // Dành cho custom
         ), $atts);
         
         $posts_per_page = absint($atts['posts_per_page']);
-        $total_posts = absint($atts['total_posts']);
-        $show_all_text = sanitize_text_field($atts['show_all_text']);
+        $total_posts    = absint($atts['total_posts']);
+        $show_all_text  = sanitize_text_field($atts['show_all_text']);
         
-        // Lấy category name
-        $category_name = isset($this->continent_mapping[$continent_key]) 
-            ? $this->continent_mapping[$continent_key] 
-            : '';
-        
-        if (empty($category_name)) {
-            return '<p>Category không tồn tại.</p>';
-        }
-        
-        // Lấy category ID
-        $category = get_term_by('name', $category_name, 'category');
-        if (!$category) {
-            return '<p>Category "' . esc_html($category_name) . '" không tồn tại.</p>';
-        }
-        
-        $category_id = $category->term_id;
-        
-        // Lấy tất cả sub-categories
-        $sub_categories = get_terms(array(
-            'taxonomy' => 'category',
-            'parent' => $category_id,
-            'hide_empty' => false
-        ));
-        
-        // Tạo array category IDs bao gồm parent và tất cả children
-        $category_ids = array($category_id);
-        if (!is_wp_error($sub_categories) && !empty($sub_categories)) {
-            foreach ($sub_categories as $sub_cat) {
-                $category_ids[] = $sub_cat->term_id;
+        $category_ids  = array();
+        $category_name = '';
+        $category_url  = '';
+        $category_id   = 0;
+
+        // XỬ LÝ CHO SHORTCODE CUSTOM
+        if ($continent_key === 'custom') {
+            if (empty($atts['cat']) || empty($atts['goto'])) {
+                return '<p>Vui lòng cung cấp đầy đủ tham số "cat" và "goto" cho shortcode.</p>';
+            }
+
+            // Lấy array ID các category cần get bài viết
+            $category_ids = array_map('intval', explode(',', $atts['cat']));
+            
+            // Lấy ID category đích đến cho nút xem tất cả
+            $goto_id = intval($atts['goto']);
+            $category_url = get_category_link($goto_id);
+            
+            // Xử lý tiêu đề hiển thị
+            $goto_cat = get_term($goto_id, 'category');
+            if (!empty($atts['title'])) {
+                $category_name = sanitize_text_field($atts['title']);
+            } else {
+                // Default lấy tên của category goto nếu không truyền title
+                $category_name = ($goto_cat && !is_wp_error($goto_cat)) ? $goto_cat->name : 'Chuyên mục';
+            }
+
+        } else {
+            // XỬ LÝ CHO SHORTCODE CHÂU LỤC CŨ (GIỮ NGUYÊN HOÀN TOÀN TÍNH LOGIC ĐỂ KHÔNG BỊ ẢNH HƯỞNG)
+            $category_name = isset($this->continent_mapping[$continent_key]) 
+                ? $this->continent_mapping[$continent_key] 
+                : '';
+            
+            if (empty($category_name)) {
+                return '<p>Category không tồn tại.</p>';
+            }
+            
+            // Lấy category ID
+            $category = get_term_by('name', $category_name, 'category');
+            if (!$category) {
+                return '<p>Category "' . esc_html($category_name) . '" không tồn tại.</p>';
+            }
+            
+            $category_id = $category->term_id;
+            $category_url = get_category_link($category_id);
+            
+            // Lấy tất cả sub-categories
+            $sub_categories = get_terms(array(
+                'taxonomy'   => 'category',
+                'parent'     => $category_id,
+                'hide_empty' => false
+            ));
+            
+            // Tạo array category IDs bao gồm parent và tất cả children
+            $category_ids = array($category_id);
+            if (!is_wp_error($sub_categories) && !empty($sub_categories)) {
+                foreach ($sub_categories as $sub_cat) {
+                    $category_ids[] = $sub_cat->term_id;
+                }
             }
         }
         
         // Query posts
         $args = array(
-            'post_type' => 'post',
-            'posts_per_page' => $total_posts,
-            'post_status' => 'publish',
-            'category__in' => $category_ids,
-            'orderby' => 'date',
-            'order' => 'DESC',
+            'post_type'           => 'post',
+            'posts_per_page'      => $total_posts,
+            'post_status'         => 'publish',
+            'category__in'        => $category_ids,
+            'orderby'             => 'date',
+            'order'               => 'DESC',
             'ignore_sticky_posts' => true
         );
         
@@ -163,20 +203,17 @@ class Nhut_Slide_For_Continent {
         // Generate unique ID
         $carousel_id = 'nhut-continent-' . $continent_key . '-' . uniqid();
         
-        // Get category URL
-        $category_url = get_category_link($category_id);
-        
         // Collect all posts
         $posts_array = array();
         while ($query->have_posts()) {
             $query->the_post();
             $posts_array[] = array(
-                'id' => get_the_ID(),
-                'title' => get_the_title(),
-                'permalink' => get_the_permalink(),
-                'thumbnail' => has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '',
+                'id'           => get_the_ID(),
+                'title'        => get_the_title(),
+                'permalink'    => get_the_permalink(),
+                'thumbnail'    => has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '',
                 'thumbnail_id' => has_post_thumbnail() ? get_post_thumbnail_id() : 0,
-                'categories' => get_the_category()
+                'categories'   => get_the_category()
             );
         }
         wp_reset_postdata();
@@ -199,7 +236,8 @@ class Nhut_Slide_For_Continent {
                 <div class="carousel-inner">
                     <?php 
                     $total_posts_count = count($posts_array);
-                    $items_per_slide = 4; // 4 items per slide on desktop
+                    // Dùng thuộc tính posts_per_page cho số lượng item mỗi slide, mặc định nếu lỗi sẽ lấy 4
+                    $items_per_slide = $posts_per_page > 0 ? $posts_per_page : 4; 
                     
                     // Calculate number of slides needed
                     $num_slides = ceil($total_posts_count / $items_per_slide);
@@ -223,7 +261,7 @@ class Nhut_Slide_For_Continent {
                             $tag_category = null;
                             if (!empty($post['categories'])) {
                                 foreach ($post['categories'] as $cat) {
-                                    if ($cat->parent == $category_id) {
+                                    if ($cat->parent == $category_id && $category_id !== 0) {
                                         $tag_category = $cat;
                                         break;
                                     }
@@ -270,7 +308,6 @@ class Nhut_Slide_For_Continent {
                     ?>
                 </div>
                 
-                <!-- Navigation arrows -->
                 <button class="carousel-control-prev nhut-continent-nav" type="button" data-bs-target="#<?php echo esc_attr($carousel_id); ?>" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
@@ -304,6 +341,11 @@ class Nhut_Slide_For_Continent {
     
     public function render_oceania($atts) {
         return $this->render_continent_carousel('oceania', $atts);
+    }
+
+    // Xử lý Custom Shortcode
+    public function render_custom($atts) {
+        return $this->render_continent_carousel('custom', $atts);
     }
 }
 

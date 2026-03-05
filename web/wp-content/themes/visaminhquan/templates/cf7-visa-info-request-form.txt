@@ -1,0 +1,39 @@
+============================================
+FORM CF7: Nhận danh sách hồ sơ Visa (bên trái layout)
+============================================
+Vào: WordPress Admin > Contact > Contact Forms > Thêm mới
+Dán toàn bộ block dưới đây vào ô "Form". Phần Mail/Message cấu hình theo nhu cầu.
+
+--------------------------------------------
+(Theo hình 2: có label, 2 ô đầu cùng hàng – CSS .vmq-vir-form đã xử lý layout)
+
+<label> Họ và tên:
+[text* your-name class:vmq-virf-name placeholder "Họ và tên"] </label>
+
+<label> Quốc gia bạn muốn đến:
+[text* visa-country class:vmq-virf-country placeholder "Quốc gia bạn muốn đến"] </label>
+
+<label> Nghề nghiệp của bạn:
+[text* your-profession class:vmq-virf-profession placeholder "Nghề nghiệp của bạn"] </label>
+
+<label> Bạn sẽ nhận thông tin qua:
+[text* your-contact class:vmq-virf-contact placeholder "Hãy điền Zalo hoặc Email bạn muốn nhận thông tin"] </label>
+
+[submit class:vmq-virf-submit "Nhận thông tin miễn phí"]
+
+--------------------------------------------
+
+Class dùng để custom CSS (trong .vmq-vir-form):
+  .vmq-virf-name     - Họ và tên
+  .vmq-virf-country  - Quốc gia bạn muốn đến
+  .vmq-virf-profession - Nghề nghiệp của bạn
+  .vmq-virf-contact  - Zalo hoặc Email
+  .vmq-virf-submit   - Nút "Nhận thông tin miễn phí"
+
+--------------------------------------------
+
+Lưu form (Save). Copy ID form (số) và thay vào shortcode trong HTML Elementor:
+
+[contact-form-7 id="YOUR_FORM_ID" title="Nhận danh sách hồ sơ Visa"]
+
+============================================

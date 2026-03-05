@@ -15,42 +15,168 @@ window.visaminhquanGoogleTranslateInit = function() {
 (function() {
     'use strict';
 
-    // Mobile menu toggle
+    // Mobile menu toggle - Version 2 (Vertical Icon Tabs)
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const mainNavigation = document.querySelector('.main-navigation');
+    const mobileMenu = document.getElementById('vmq-mobile-menu');
+    const mobileMenuTabs = document.getElementById('vmq-mobile-menu-tabs');
+    const mobileMenuContent = document.getElementById('vmq-mobile-menu-content');
     const body = document.body;
 
-    if (mobileMenuToggle && mainNavigation) {
-        mobileMenuToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const isActive = mainNavigation.classList.toggle('active');
-            this.setAttribute('aria-expanded', isActive);
-            
-            // Prevent body scroll when menu is open
-            if (isActive) {
-                body.style.overflow = 'hidden';
+    function closeMobileMenu() {
+        if (!mobileMenu) return;
+        mobileMenu.classList.remove('is-open');
+        body.style.overflow = '';
+        if (mobileMenuToggle) {
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function openMobileMenu() {
+        if (!mobileMenu) return;
+        mobileMenu.classList.add('is-open');
+        body.style.overflow = 'hidden';
+        if (mobileMenuToggle) {
+            mobileMenuToggle.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    // Accordion cho submenu trong mobile menu
+    function setupMobileAccordion(listElement) {
+        if (!listElement) return;
+
+        const parents = listElement.querySelectorAll('li.menu-item-has-children, li:has(> ul)');
+
+        parents.forEach(function (li) {
+            const submenu = li.querySelector(':scope > ul');
+            const triggerLink = li.querySelector(':scope > a');
+            if (!submenu || !triggerLink) return;
+
+            li.classList.add('vmq-mobile-accordion');
+
+            const headerBtn = document.createElement('button');
+            headerBtn.type = 'button';
+            headerBtn.className = 'vmq-mobile-acc-header';
+            headerBtn.innerHTML = '<span class="vmq-mobile-acc-label">' + triggerLink.textContent.trim() + '</span><span class="vmq-mobile-acc-icon"></span>';
+
+            li.insertBefore(headerBtn, triggerLink);
+            triggerLink.remove();
+
+            submenu.classList.add('vmq-mobile-acc-panel');
+            submenu.style.display = 'none';
+
+            headerBtn.addEventListener('click', function () {
+                const isOpen = li.classList.toggle('is-open');
+                submenu.style.display = isOpen ? 'block' : 'none';
+            });
+        });
+    }
+
+    function buildMobileMenuFromPrimary() {
+        const primaryMenu = document.getElementById('primary-menu');
+        if (!primaryMenu || !mobileMenuTabs || !mobileMenuContent) return;
+
+        // Reset containers
+        mobileMenuTabs.innerHTML = '';
+        mobileMenuContent.innerHTML = '';
+
+        const topItems = Array.prototype.filter.call(primaryMenu.children, function (el) {
+            return el.tagName === 'LI';
+        });
+
+        topItems.forEach(function (item, index) {
+            const link = item.querySelector('a');
+            if (!link) return;
+
+            const title = link.textContent.trim();
+            const tabId = 'vmq-mobile-tab-' + index;
+
+            // Create tab button
+            const tabButton = document.createElement('button');
+            tabButton.type = 'button';
+            tabButton.className = 'vmq-mobile-tab';
+            tabButton.dataset.tab = tabId;
+            tabButton.innerHTML = '<span class="vmq-mobile-tab-label">' + title + '</span>';
+
+            // Create panel
+            const panel = document.createElement('div');
+            panel.className = 'vmq-mobile-panel';
+            panel.dataset.tab = tabId;
+
+            const submenu = item.querySelector('ul');
+            let list;
+
+            if (submenu) {
+                list = submenu.cloneNode(true);
+                list.classList.add('vmq-mobile-submenu');
+                // Thiết lập accordion cho các nhóm bên trong
+                setupMobileAccordion(list);
             } else {
-                body.style.overflow = '';
+                list = document.createElement('ul');
+                list.className = 'vmq-mobile-submenu';
+                const li = document.createElement('li');
+                li.appendChild(link.cloneNode(true));
+                list.appendChild(li);
+            }
+
+            panel.appendChild(list);
+            mobileMenuTabs.appendChild(tabButton);
+            mobileMenuContent.appendChild(panel);
+
+            tabButton.addEventListener('click', function () {
+                const allTabs = mobileMenuTabs.querySelectorAll('.vmq-mobile-tab');
+                const allPanels = mobileMenuContent.querySelectorAll('.vmq-mobile-panel');
+
+                allTabs.forEach(function (btn) {
+                    btn.classList.remove('active');
+                });
+                allPanels.forEach(function (p) {
+                    p.classList.remove('active');
+                });
+
+                tabButton.classList.add('active');
+                panel.classList.add('active');
+            });
+        });
+
+        // Kích hoạt tab đầu tiên
+        const firstTab = mobileMenuTabs.querySelector('.vmq-mobile-tab');
+        const firstPanel = mobileMenuContent.querySelector('.vmq-mobile-panel');
+        if (firstTab && firstPanel) {
+            firstTab.classList.add('active');
+            firstPanel.classList.add('active');
+        }
+    }
+
+    if (mobileMenuToggle && mobileMenu) {
+        buildMobileMenuFromPrimary();
+
+        mobileMenuToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (mobileMenu.classList.contains('is-open')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
             }
         });
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
-            if (mainNavigation.classList.contains('active') && 
-                !mainNavigation.contains(e.target) && 
-                !mobileMenuToggle.contains(e.target)) {
-                mainNavigation.classList.remove('active');
-                mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                body.style.overflow = '';
+        // Click backdrop hoặc nút đóng để đóng
+        mobileMenu.addEventListener('click', function (e) {
+            if (e.target.classList.contains('vmq-mobile-menu-backdrop')) {
+                closeMobileMenu();
             }
         });
 
-        // Close mobile menu on window resize if it's larger than mobile
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768 && mainNavigation.classList.contains('active')) {
-                mainNavigation.classList.remove('active');
-                mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                body.style.overflow = '';
+        const closeBtn = mobileMenu.querySelector('.vmq-mobile-menu-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                closeMobileMenu();
+            });
+        }
+
+        // Đóng khi resize lên desktop
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 992 && mobileMenu.classList.contains('is-open')) {
+                closeMobileMenu();
             }
         });
     }

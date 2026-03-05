@@ -1,0 +1,12 @@
+[03-Mar-2026 11:22:51 UTC] PHP Warning:  Constant WP_DEBUG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 21
+[03-Mar-2026 11:22:51 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:23:17 UTC] PHP Warning:  Constant WP_DEBUG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 21
+[03-Mar-2026 11:23:17 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:23:33 UTC] PHP Warning:  Constant WP_DEBUG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 21
+[03-Mar-2026 11:23:33 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:23:45 UTC] PHP Warning:  Constant WP_DEBUG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 21
+[03-Mar-2026 11:23:45 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:25:34 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:25:35 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:26:55 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22
+[03-Mar-2026 11:26:56 UTC] PHP Warning:  Constant WP_DEBUG_LOG already defined in /home/nhviszvu/public_html/wp-config-production.php on line 22

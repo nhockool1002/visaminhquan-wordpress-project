@@ -3,10 +3,10 @@
  * VMQ Hero Form Styling
  */
 
-/* Font UTM Avo dùng cho toàn bộ khu vực landing & footer */
+/* Font UTM Avo dùng cho toàn bộ khu vực landing & footer - local woff2 */
 @font-face {
     font-family: 'UTM Avo';
-    src: url('../font/utm-avo.ttf') format('truetype');
+    src: url('/wp-content/themes/visaminhquan/assets/font/utm-avo.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -14,7 +14,7 @@
 
 @font-face {
     font-family: 'UTM Avo';
-    src: url('../font/utm-avobold.ttf') format('truetype');
+    src: url('/wp-content/themes/visaminhquan/assets/font/utm-avobold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -2508,9 +2508,9 @@
 /* =========================================
    SECTION: LIÊN HỆ NGAY VỚI VISA MINH QUÂN (COMPACT)
    ========================================= */
-   .vmq-contact-section {
-    background: #fff;
-    padding: 60px 0; /* Giảm padding tổng thể section */
+.vmq-contact-section {
+    background: #f8f8f8;
+    padding: 60px 0;
     font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
     overflow: hidden;
     width: 100%;
@@ -2535,22 +2535,22 @@
 }
 
 .vmq-contact-title {
-    font-size: 48px;
+    font-size: 30px;
     font-weight: 800;
-    color: #123a63;
-    margin: 0 0 10px 0; /* Giảm margin dưới tiêu đề */
+    color: #1f2937;
+    margin: 0 0 10px 0;
     line-height: 1.2;
     text-align: left !important;
 }
 
 .vmq-title-highlight {
-    color: #f2b533;
+    color: #2563eb;
 }
 
 .vmq-contact-description {
     font-size: 18px;
     line-height: 1.6;
-    color: #5b6b7a;
+    color: #374151;
     margin: 0;
     max-width: 800px;
 }
@@ -2566,6 +2566,14 @@
 /* --- FORM STYLING (COMPACT VERSION) --- */
 .vmq-contact-form-col {
     width: 100%;
+}
+
+/* Text dưới form: Thông tin được bảo mật tuyệt đối... */
+.vmq-contact-section .vmq-contact-form-col > span {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #374151;
 }
 
 /* Container của Form (không nền, trong .vmq-cf7-contact-mau đã có nền xanh đậm) */
@@ -2584,14 +2592,14 @@
     width: 100%;
 }
 
-/* INPUT FIELDS (Gọn hơn) */
+/* INPUT FIELDS (nền trắng, border xanh nhạt) */
 .vmq-contact-section input[type="text"],
 .vmq-contact-section input[type="email"],
 .vmq-contact-section input[type="tel"] {
     width: 100% !important;
     background: #ffffff !important;
-    border: none;
-    border-radius: 99px;
+    border: 1px solid #dbe9f8;
+    border-radius: 12px;
     padding: 0 20px;
     height: 48px; /* GIẢM HEIGHT: Từ 55px xuống 48px cho gọn */
     font-size: 15px; /* Chữ nhỏ lại 1 xíu cho cân đối */
@@ -2601,12 +2609,12 @@
     display: block;
 }
 
-/* TEXTAREA (Gọn hơn) */
+/* TEXTAREA */
 .vmq-contact-section textarea {
     width: 100% !important;
     background: #ffffff !important;
-    border: 1px solid #d1d5dc;
-    border-radius: 30px;
+    border: 1px solid #dbe9f8;
+    border-radius: 12px;
     padding: 15px 20px;
     font-size: 15px;
     color: #123a63 !important;
@@ -2626,14 +2634,14 @@
     font-weight: 500;
 }
 
-/* SUBMIT BUTTON */
+/* SUBMIT BUTTON (cam, chữ trắng) */
 .vmq-contact-section input[type="submit"],
 .vmq-contact-section .wpcf7-submit {
     width: 100%;
-    background: #ffde59;
-    color: #001776;
+    background: #ffb20e;
+    color: #fff;
     border: none;
-    border-radius: 99px;
+    border-radius: 12px;
     padding: 0 30px;
     font-size: 17px;
     font-weight: 800;
@@ -2648,8 +2656,8 @@
 
 .vmq-contact-section input[type="submit"]:hover,
 .vmq-contact-section .wpcf7-submit:hover {
-    background: #e8c84f;
-    color: #001776;
+    background: #e5a00c;
+    color: #fff;
     transform: translateY(-2px);
 }
 
@@ -3591,19 +3599,13 @@
     display: flex;
     align-items: center;
     gap: 18px;
+    flex-wrap: wrap;
 }
 
 .vmq-social-icon {
-    display: flex;
     align-items: center;
     justify-content: center;
-    width: 72px;
-    height: 72px;
-    padding: 16px;
-    border-radius: 10px;
-    border: 2px solid #123a63;
-    background-color: #f6fbff;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
     text-decoration: none;
 }
 
@@ -3613,10 +3615,34 @@
 }
 
 .vmq-social-icon img {
-    width: 72px;
-    height: 72px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
+}
+
+/* ============================
+   Footer social - desktop
+   Thu nhỏ icon, bỏ khung to
+   ============================ */
+@media (min-width: 769px) {
+    .vmq-footer-col-main .vmq-footer-social-icons {
+        justify-content: flex-start;
+        gap: 14px;
+        flex-wrap: nowrap;
+    }
+
+    .vmq-footer-col-main .vmq-social-icon {
+        width: 65px;
+        border-radius: 999px;
+        border-width: 1px;
+        box-shadow: none;
+    }
+
+    .vmq-footer-col-main .vmq-social-icon img {
+        width: 100%;
+        height: 100%;
+    }
 }
 
 /* Scroll to Top Button */
@@ -3756,12 +3782,14 @@ footer.vmq-footer {
     }
     
     .vmq-footer-social-icons {
-        gap: 10px;
+        gap: 12px;
+        justify-content: center;
     }
     
     .vmq-social-icon {
-        width: 28px;
-        height: 28px;
+        width: 44px;
+        height: 44px;
+        padding: unset;
     }
 }
 
@@ -4992,7 +5020,7 @@ footer.vmq-footer {
 }
 
 .mq-pricing-heading {
-    color: #0b1c44;
+    color: #0e3a6d;
     font-size: 32px;
     font-weight: 700;
     margin: 0;
@@ -5331,6 +5359,7 @@ footer.vmq-footer {
     .vmq-why-choose .vmq-col-center { width: 320px; }
     .vmq-why-choose .vmq-card { padding: 40px 18px 26px 18px; }
     .vmq-why-choose .vmq-card-content { font-size: 18px; }
+    .vmq-col-side.vmq-col-left .vmq-card { margin-left: unset !important;}
 }
 
 @media (max-width: 900px) {
@@ -6477,6 +6506,7 @@ footer.vmq-footer {
     color: #0b1c44;
     font-weight: 700;
     margin: 30px 0 15px 0;
+    scroll-margin-top: 135px;
 }
 
 .vmq-single-post-content h2 {
@@ -7440,8 +7470,8 @@ li#menu-item-813 {
 
 li#menu-item-839 {
     position: absolute;
-    right: 8%;
-    top: 42%;
+    right: 33%;
+    bottom: 290%;
 }
 
 .header-contact .btn-contact {
@@ -7740,16 +7770,31 @@ li#menu-item-839 {
 }
 
 @media (max-width: 768px) {
+    /* Sticky footer: 1 hàng / 4 cột, chỉ icon */
     .vmq-sticky-footer-inner {
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 10px 12px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 0;
+        padding: 8px 6px;
     }
 
     .vmq-sticky-item {
-        flex: 1 1 calc(50% - 4px);
-        font-size: 13px;
-        padding: 8px;
+        flex: 1 1 25%;
+        justify-content: center;
+        font-size: 0;
+        padding: 6px 4px;
+    }
+
+    /* Ẩn text, chỉ hiển thị icon */
+    .vmq-sticky-item span {
+        display: none;
+    }
+
+    .vmq-sticky-footer .vmq-sticky-icon {
+        width: 24px;
+        height: 24px;
     }
 
     .vmq-sticky-sep {
@@ -7798,6 +7843,20 @@ div[data-id="744b572"] .vmq-contact-wrap {
     margin: 0 auto;
 }
 
+div[data-id="744b572"] .vmq-contact-description {
+    color: #123a63;
+}
+
+div[data-wpcf7-id="216"] .notice-msg {
+    color: #123a63 !important;
+    display: block !important;
+}
+
+div[data-id="744b572"] .vmq-contact-form-col .vmq-title-highlight {
+    color: #ffa500 !important;
+    display: inline !important;
+}
+
 div[data-id="744b572"] .vmq-contact-section {
     position: relative;
     width: 100vw;
@@ -7819,9 +7878,686 @@ div[data-id="61b4ed6"] .vmq-cp-title {
 }
 
 div[data-id="744b572"] .vmq-contact-form-col span {
+    display: inline;
+    color: #f2b820;
+}
+
+div[data-id="744b572"] .vmq-contact-form-col span {
     display: none;
+}
+
+div[data-id="744b572"] .vmq-contact-form-col h2 {
+    display: inline;
 }
 
 form.vmq-hero-form-custom {
     padding-top: 90px;
+}
+
+/* =========================================
+   SECTION: Nhận danh sách hồ sơ Visa (theo hình 2 – mockup laptop)
+   Trái: logo góc trái, form có label; 2 ô đầu cùng hàng; ô input nền xanh nhạt bo tròn
+   Phải: nền xanh teal nhạt, headline + 2 đoạn text xanh đậm, hình máy bay góc phải
+   Class: .vmq-vir-*
+   ========================================= */
+.vmq-vir-section {
+    width: 100%;
+    overflow: hidden;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    background: #fff;
+}
+
+.vmq-vir-section * {
+    box-sizing: border-box;
+}
+
+.vmq-vir-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: 480px;
+    align-items: stretch;
+}
+
+/* Cột trái: nền trắng, logo góc trái + form (có label) */
+.vmq-vir-left {
+    background: #fff;
+    padding: 40px 36px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+}
+
+.vmq-vir-logo {
+    flex-shrink: 0;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a237e;
+}
+
+.vmq-vir-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vmq-vir-form-wrap {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Form: có label; 2 ô đầu cùng hàng; ô input nền xanh nhạt bo tròn */
+.vmq-vir-form .wpcf7-form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.vmq-vir-form .wpcf7-form-control-wrap {
+    display: block;
+    width: 100%;
+}
+
+.vmq-vir-form .wpcf7-form p {
+    margin: 0 6px 14px 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.vmq-vir-form .wpcf7-form p:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Hàng 1: Họ và tên + Quốc gia bạn muốn đến cùng dòng (mỗi ô 50% trừ nửa khe 6px) */
+.vmq-vir-form .wpcf7-form p:nth-of-type(1),
+.vmq-vir-form .wpcf7-form p:nth-of-type(2) {
+    flex: 0 0 calc(50% - 3px);
+}
+
+.vmq-vir-form .wpcf7-form p:nth-of-type(2) {
+    margin-right: 0;
+}
+
+/* Ô 3, 4, 5 (nghề nghiệp, nhận thông tin qua, submit): full width */
+.vmq-vir-form .wpcf7-form p:nth-of-type(3),
+.vmq-vir-form .wpcf7-form p:nth-of-type(4),
+.vmq-vir-form .wpcf7-form p:nth-of-type(5) {
+    flex: 0 0 100%;
+    margin-right: 0;
+}
+
+.vmq-vir-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a237e;
+    margin-bottom: 6px;
+}
+
+.vmq-vir-form input[type="text"],
+.vmq-vir-form input[type="email"],
+.vmq-vir-form input[type="tel"] {
+    width: 100%;
+    background: #e0f7fa;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    height: 48px;
+    font-size: 15px;
+    color: #1a237e;
+    outline: none;
+}
+
+.vmq-vir-form input::placeholder {
+    color: #1a237e;
+    opacity: 0.7;
+}
+
+.vmq-vir-form input[type="submit"],
+.vmq-vir-form .wpcf7-submit {
+    width: 100%;
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    margin-top: 4px;
+}
+
+.vmq-vir-form input[type="submit"]:hover,
+.vmq-vir-form .wpcf7-submit:hover {
+    opacity: 0.9;
+}
+
+.vmq-vir-form .wpcf7-form-control-wrap {
+    display: block !important;
+}
+
+.vmq-vir-form br {
+    display: none;
+}
+
+.vmq-vir-disclaimer {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+/* Cột phải: nền xanh teal nhạt (soft light blue/teal), chữ xanh đậm, hình máy bay góc phải */
+.vmq-vir-right {
+    background: #c5e3f0;
+    padding: 48px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.vmq-vir-headline {
+    margin: 0 0 18px;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #1a237e;
+}
+
+.vmq-vir-desc {
+    margin: 0 0 28px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #1a237e;
+}
+
+.vmq-vir-illus {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.vmq-vir-illus img {
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .vmq-vir-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .vmq-vir-left {
+        padding: 36px 24px 40px;
+        gap: 24px;
+    }
+
+    .vmq-vir-logo {
+        width: 140px;
+        height: 140px;
+    }
+
+    .vmq-vir-form-wrap {
+        max-width: 100%;
+    }
+
+    .vmq-vir-form .wpcf7-form p:nth-of-type(1),
+    .vmq-vir-form .wpcf7-form p:nth-of-type(2) {
+        flex: 0 0 100%;
+        margin-right: 0;
+    }
+
+    .vmq-vir-right {
+        padding: 40px 24px 36px;
+    }
+
+    .vmq-vir-headline {
+        font-size: 22px;
+    }
+
+    .vmq-vir-illus {
+        justify-content: center;
+    }
+
+    .vmq-vir-illus img {
+        max-width: 220px;
+    }
+}
+
+/* ============================================
+   VMQ Process Section - Quy trình hỗ trợ xin Visa Mỹ
+   Vòng tròn trắng viền xanh + số xanh | thanh dọc kết nối | nền trắng
+   Inner max-width 1200px
+   ============================================ */
+.vmq-process-section * {
+    box-sizing: border-box;
+}
+
+.vmq-process-section {
+    --vmq-process-bg: #e0f2f7;
+    --vmq-process-blue: #003366;
+    --vmq-process-desc: #4a4a4a;
+    /* Nền full width viewport */
+    width: 100vw;
+    max-width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    background: var(--vmq-process-bg);
+    padding: 48px 0 56px;
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Các item bên trong giới hạn 1200px, căn giữa */
+.vmq-process-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.vmq-process-title {
+    margin: 0 0 36px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--vmq-process-blue);
+    text-align: center;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+}
+
+.vmq-process-section .vmq-process-steps {
+    position: relative;
+}
+
+/* Thanh dọc xanh đậm kết nối các vòng tròn */
+.vmq-process-section .vmq-process-line {
+    position: absolute;
+    left: 55px;
+    top: 32px;
+    bottom: 32px;
+    width: 4px;
+    background: var(--vmq-process-blue);
+    border-radius: 2px;
+    z-index: 0;
+}
+
+.vmq-process-section .vmq-process-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.vmq-process-section .vmq-process-item {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    min-height: 80px;
+    text-align: left;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    box-shadow: none;
+}
+
+/* Cột trái - không gian cho thanh dọc */
+.vmq-process-section .vmq-process-badge-wrap {
+    flex-shrink: 0;
+    width: 114px;
+}
+
+/* Ô nội dung - so1-5 làm background, lệch trái */
+.vmq-process-section .vmq-process-content {
+    flex: 1;
+    min-width: 0;
+    background-color: #fff;
+    padding: 18px 24px 20px 24px;
+    padding-left: 120px;
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 51, 102, 0.08);
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 56px 56px;
+}
+
+.vmq-process-section .vmq-process-content-1 {
+    background-image: url(/wp-content/uploads/2026/02/so1.png);
+}
+
+.vmq-process-section .vmq-process-content-2 {
+    background-image: url(/wp-content/uploads/2026/02/so2.png);
+}
+
+.vmq-process-section .vmq-process-content-3 {
+    background-image: url(/wp-content/uploads/2026/02/so3.png);
+}
+
+.vmq-process-section .vmq-process-content-4 {
+    background-image: url(/wp-content/uploads/2026/02/so4.png);
+}
+
+.vmq-process-section .vmq-process-content-5 {
+    background-image: url(/wp-content/uploads/2026/02/so5.png);
+}
+
+.vmq-process-section .vmq-process-step-title {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--vmq-process-blue);
+    line-height: 1.3;
+}
+
+.vmq-process-section .vmq-process-step-desc {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--vmq-process-desc);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .vmq-process-section {
+        padding: 36px 0 44px;
+    }
+
+    .vmq-process-section .vmq-process-inner {
+        padding: 0 16px;
+    }
+
+    .vmq-process-section .vmq-process-title {
+        font-size: 22px;
+        margin-bottom: 28px;
+    }
+
+    .vmq-process-section .vmq-process-line {
+        left: 39px;
+        top: 28px;
+        bottom: 28px;
+    }
+
+    .vmq-process-section .vmq-process-item {
+        min-height: 72px;
+    }
+
+    .vmq-process-section .vmq-process-badge-wrap {
+        width: 78px;
+    }
+
+    .vmq-process-section .vmq-process-content {
+        padding: 14px 18px 16px 18px;
+        padding-left: 100px;
+        background-size: 48px 48px;
+    }
+
+    .vmq-process-section .vmq-process-step-title {
+        font-size: 16px;
+    }
+
+    .vmq-process-section .vmq-process-step-desc {
+        font-size: 14px;
+    }
+}
+
+.vmq-process-item .vmq-process-content {
+    background-image: url('/wp-content/uploads/2026/02/so1.png');
+    background-position: left 2% center !important;
+    background-size: 81px 81px !important;
+}
+
+.vmq-process-item:nth-child(2) .vmq-process-content {
+    background-image: url('/wp-content/uploads/2026/02/so2.png');
+}
+
+.vmq-process-item:nth-child(3) .vmq-process-content {
+    background-image: url('/wp-content/uploads/2026/02/so3.png');
+}
+
+.vmq-process-item:nth-child(4) .vmq-process-content {
+    background-image: url('/wp-content/uploads/2026/02/so4.png');
+}
+
+.vmq-process-item:nth-child(5) .vmq-process-content {
+    background-image: url('/wp-content/uploads/2026/02/so5.png');
+}
+
+div[data-id="867e444"] {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    li#menu-item-839 {
+        position: unset;
+    }
+
+    li#menu-item-813 {
+        margin-top: unset;
+    }
+
+    li#menu-item-62 {
+        margin-top: unset;
+    }
+
+    .vmq-footer-content {
+        display: block;
+        max-width: 100%;
+        margin-bottom: 50px;
+    }
+
+    .vmq-social-icon {
+        width: 56px;
+        height: 56px;
+        padding: unset;
+    }
+
+    .vmq-footer-col-main {
+        margin-bottom: 30px;
+    }
+
+    .mq-faq-arrow {
+        right: 10px;
+    }
+
+    .vmq-hero-content .vmq-btn-wrapper {
+        text-align: center;
+    }
+
+    .vmq-hero-section {
+        background-size: initial;
+        background-position: top left;
+    }
+}
+
+/* Tùy chỉnh bảng trong bài viết */
+.vmq-single-post-main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e4e8;
+}
+
+/* Header đồng nhất một màu xanh cho tất cả các ô ở dòng đầu */
+.vmq-single-post-main table tr:first-child td {
+    background-color: #3470b1 !important; /* Màu xanh đồng nhất */
+    color: #ffffff !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    border: none;
+}
+
+/* Cột tiêu chí (Cột 1) từ dòng thứ 2 trở đi */
+.vmq-single-post-main table tr:not(:first-child) td:first-child {
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+/* Các ô nội dung thông thường */
+.vmq-single-post-main table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+/* Hiệu ứng dòng kẻ sọc cho dễ đọc */
+.vmq-single-post-main table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+.vmq-single-post-main table tr:nth-child(odd):not(:first-child) {
+    background-color: #fcfcfc;
+}
+
+/* Responsive cho di động */
+@media (max-width: 600px) {
+    .vmq-single-post-main table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+.vmq-single-post-main p {
+    font-size: 18px;
+}
+
+.vmq-single-post-main span {
+    font-size: 18px;
+}
+
+.vmq-single-post-main li {
+    font-size: 18px;
+}
+
+.vmq-toc-list p, .vmq-toc-list li, .vmq-toc-list a {
+    font-size: 17px;
+}
+
+.vmq-toc-link {
+    font-size: 16px !important;
+}
+
+/* Responsive cho Mobile (thường là dưới 768px) */
+@media (max-width: 767px) {
+    .vmq-post-author-info {
+        display: flex;
+        flex-direction: column; /* Đẩy ảnh lên trên, chữ xuống dưới */
+        align-items: center;    /* Căn giữa theo chiều ngang */
+        text-align: center;     /* Căn giữa nội dung văn bản */
+    }
+
+    .vmq-post-author-avatar {
+        margin-bottom: 15px;    /* Tạo khoảng cách giữa ảnh và tên */
+        margin-right: 0;        /* Xóa margin phải nếu có để tránh lệch tâm */
+    }
+
+    .vmq-post-author-avatar img {
+        width: 120px;           /* Bạn có thể điều chỉnh kích thước ảnh phù hợp */
+        height: 120px;
+        border-radius: 50%;     /* Đảm bảo ảnh luôn tròn */
+        object-fit: cover;
+    }
+
+    .vmq-post-author-name {
+        margin-top: 10px;
+        font-size: 1.2rem;      /* Điều chỉnh cỡ chữ tên chuyên gia */
+    }
+
+    .vmq-post-author-bio {
+        padding: 0 10px;        /* Thêm chút khoảng trống hai bên cho dễ đọc */
+        line-height: 1.6;
+    }
+
+    /* Căn giữa phần share luôn cho đồng bộ */
+    .vmq-post-share {
+        justify-content: center;
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .vmq-post-share-icons {
+        justify-content: center;
+    }
+}
+
+.vmq-single-post-author {
+    display: none;
+}
+
+/* VISA CANADA */
+
+.vmq-visa-wrapper.threeblock .vmq-services-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+h2.elementor-heading-title {
+    color: #123a63 !important;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+h3.elementor-heading-title {
+    color: #123a63 !important;
+    font-size: 28px;
+    font-weight: 500;
+}
+
+h4.elementor-heading-title {
+    color: #123a63 !important;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+h5.elementor-heading-title {
+    color: #123a63 !important;
+    font-size: 20px;
+    font-weight: 300;
+}
+
+h6.elementor-heading-title {
+    color: #123a63 !important;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.hidden {
+    dislay: none !important;
+}
+
+.nhut-continent-title {
+    color: #123a63 !important;
+}
+
+.nhut-continent-post-title a {
+    color: #123a63 !important;
+}
+
+.nhut-continent-view-all {
+    color: #123a63 !important;
+    font-weight: 900;
 }

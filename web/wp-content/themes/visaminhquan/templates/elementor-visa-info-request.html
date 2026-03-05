@@ -1,0 +1,36 @@
+<!--
+  Section: Nhận danh sách hồ sơ Visa
+  Trái: Logo + Form CF7 (class .vmq-vir-form)
+  Phải: Headline + mô tả + hình máy bay giấy
+
+  Cách dùng:
+  1. Tạo form CF7 theo file: templates/cf7-visa-info-request-form.txt
+  2. Thay YOUR_FORM_ID trong shortcode bên dưới bằng ID form vừa tạo.
+  3. Chèn toàn bộ block này vào Elementor > HTML widget.
+  4. Hình ảnh dùng đường dẫn upload; nếu cần URL động thì dùng shortcode hoặc chỉnh trên server.
+-->
+<div class="vmq-vir-section">
+  <div class="vmq-vir-inner">
+    <!-- Cột trái: Logo + Form -->
+    <div class="vmq-vir-left">
+      <div class="vmq-vir-logo">
+        <img src="/wp-content/uploads/2026/01/cropped-LOGOVISAMINHQUAN.png" alt="Visa Minh Quân - Tư vấn Visa theo yêu cầu thực tế" loading="lazy" />
+      </div>
+      <div class="vmq-vir-form-wrap">
+        <div class="vmq-vir-form">
+          [contact-form-7 id="YOUR_FORM_ID" title="Nhận danh sách hồ sơ Visa"]
+        </div>
+        <p class="vmq-vir-disclaimer">Thông tin được bảo mật tuyệt đối – Không phát sinh chi phí</p>
+      </div>
+    </div>
+
+    <!-- Cột phải: Headline + Mô tả + Hình -->
+    <div class="vmq-vir-right">
+      <h2 class="vmq-vir-headline">Nhận ngay danh sách hồ sơ cần thiết xin Visa</h2>
+      <p class="vmq-vir-desc">Bạn lần đầu làm Visa và chưa biết bản thân cần chuẩn bị những gì để nộp hồ sơ. Hãy điền ngay thông tin! Chúng tôi sẽ gửi cho bạn danh sách hồ sơ phù hợp với nhu cầu xin Visa ngay bây giờ.</p>
+      <div class="vmq-vir-illus">
+        <img src="/wp-content/uploads/2026/01/ht.png" alt="" role="presentation" loading="lazy" />
+      </div>
+    </div>
+  </div>
+</div>

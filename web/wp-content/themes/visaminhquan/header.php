@@ -13,13 +13,29 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TW93HHDD');</script>
+    <!-- End Google Tag Manager -->
+	<link rel="preload" as="image" href="https://visaminhquan.com.vn/wp-content/uploads/2026/02/vs1.png" fetchpriority="high">
+	<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Manrope-Regular.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Manrope-Bold.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Manrope-SemiBold.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Manrope-Medium.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Manrope-ExtraBold.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Roboto-Regular.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="https://visaminhquan.com.vn/wp-content/themes/visaminhquan/assets/font/Roboto-Bold.woff2" type="font/woff2" crossorigin>
 	<?php wp_head(); ?>
 </head>
 
 <body <?php body_class(); ?>>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TW93HHDD"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <?php wp_body_open(); ?>
 
 <div id="page" class="site">
@@ -91,6 +107,28 @@
 						);
 						?>
 					</nav><!-- #site-navigation -->
+
+					<!-- Mobile Menu V2: Vertical Icon Tabs -->
+					<div class="vmq-mobile-menu" id="vmq-mobile-menu" aria-hidden="true">
+						<div class="vmq-mobile-menu-backdrop"></div>
+						<div class="vmq-mobile-menu-panel" role="dialog" aria-modal="true">
+							<div class="vmq-mobile-menu-header">
+								<span class="vmq-mobile-menu-title">Menu</span>
+								<button type="button" class="vmq-mobile-menu-close" aria-label="<?php esc_attr_e( 'Đóng menu', 'visaminhquan' ); ?>">
+									<span></span>
+									<span></span>
+								</button>
+							</div>
+							<div class="vmq-mobile-menu-inner">
+								<div class="vmq-mobile-menu-tabs" id="vmq-mobile-menu-tabs">
+									<!-- JS will inject main menu tabs here -->
+								</div>
+								<div class="vmq-mobile-menu-content" id="vmq-mobile-menu-content">
+									<!-- JS will inject submenu panels here -->
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<div class="header-right">
 						<div class="header-search">

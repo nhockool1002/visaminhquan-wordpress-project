@@ -406,3 +406,26 @@ ddev restart
 - Tất cả các lệnh cần chạy từ thư mục gốc của dự án
 - Để xem thêm thông tin về một lệnh cụ thể, sử dụng: `ddev <command> --help`
 
+## Cấu hình cache font trên production (.htaccess)
+
+Nếu deploy dự án lên shared hosting dùng Apache/LiteSpeed, có thể thêm đoạn sau vào file `.htaccess` (cùng thư mục với `wp-config.php`) để bật browser cache dài hạn cho font:
+
+```apache
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Fonts
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff  "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/font-woff  "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(woff2?|ttf|otf|eot|svg)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+```
+
+Đây là cấu hình gợi ý cho production để cải thiện mục **Use efficient cache lifetimes** (Lighthouse) với các file font.

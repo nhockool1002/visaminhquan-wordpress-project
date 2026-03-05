@@ -1,4 +1,6 @@
 <?php
+define( 'WP_CACHE', true ); // Added by WP Rocket
+
 /**
  * #ddev-generated: Automatically generated WordPress settings file.
  * ddev manages this file and may delete or overwrite the file unless this comment is removed.
@@ -14,14 +16,14 @@ define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
 /** Authentication Unique Keys and Salts. */
-define( 'AUTH_KEY', 'aGUNMeDRTWKvCLuKtEfvBKOcFyWdDubLLhttvKrSuxkATUWvXqRqXBgMvNGyIeiX' );
-define( 'SECURE_AUTH_KEY', 'iJdbAVnaDiAhmAERQwrAnBZcAXNWjbYvUBEosanDePrsedNjwCapgzcVgrTgPMqD' );
-define( 'LOGGED_IN_KEY', 'TmpnqyQTCTLFBSpnTUTwozNCuafaFSuqNpmGpdlAwoayitKQvdbvkztPUOKVHQHh' );
-define( 'NONCE_KEY', 'pnKAWbVUaPYMiEPcaQeRamJdjmOdEDCKoCTajwdbLVvQAFQEoHfAJikdeBEACiUr' );
-define( 'AUTH_SALT', 'IWHzNdzxWQYslZEhDxjfkxVUTwYqWIJklHyRhLLxPwGCYLdUzOsECkohrycwUXEB' );
-define( 'SECURE_AUTH_SALT', 'QsynPlGjFVgwVlVtgLOlVoUgbtamqGZZmxiAtpCcLMZtYeTRkwZUKgeVLeAHupRB' );
-define( 'LOGGED_IN_SALT', 'YjQdjBEhwVCxDywRaVLuzwfVqIrJlDzTtiJqJxPqOLBYOISivRiZNvBRcqkjUHHN' );
-define( 'NONCE_SALT', 'sQohphSocKQlnMlQUHIoWLFuXsGcQmLXDrRtqJWJxtgraBLAeGFskRJzlDLqIFJQ' );
+define( 'AUTH_KEY', 'MVZxmdyiOhgRAUIxURauydMtyTIkNensQlhDJcawjDxgLmSaWGCkrTfejvMebNpa' );
+define( 'SECURE_AUTH_KEY', 'NSBDpZpgnwgzyxjnKacjRPiRFaOnoZuolbaBYHXHOeygZGJOXqBpknzdknSYKOsC' );
+define( 'LOGGED_IN_KEY', 'heTeixjzgeIBDNoIIgTUxIgkLXDFHJJkYqrwEdxohxQPqaDyDSsYJIijNNfZIwvS' );
+define( 'NONCE_KEY', 'CSEwFbtzXHSmfNcCvjOaxBgxzhbChxxEbLUYrRRtnWmEmYUoCTtvibOmquLMXMnt' );
+define( 'AUTH_SALT', 'CAgaALYWtAZHtFNNjxIOjifnsELNUpCTXxnJIEPYezRqybzDjKoysAfnOkzGTVCO' );
+define( 'SECURE_AUTH_SALT', 'AgbEQOLGMeOfvkUfvRrKFuKJqjmDYkqOmtHzSyKeSBvYdNDoXvQYfwPfWsIVrlqu' );
+define( 'LOGGED_IN_SALT', 'mGcvkEdWwtxAJUxUiUUAdkcaunkzkselXbZcnSKQTgVoTHoIokJkCtjloAYxIpAh' );
+define( 'NONCE_SALT', 'qWzBejVRRlxGriJfBTlqmdFJmkhEsDQCTOECpWUpoGRRIMykJrlOgoItilwZCsdL' );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
@@ -32,18 +34,10 @@ define( 'NONCE_SALT', 'sQohphSocKQlnMlQUHIoWLFuXsGcQmLXDrRtqJWJxtgraBLAeGFskRJzl
 /** Absolute path to the WordPress directory. */
 defined( 'ABSPATH' ) || define( 'ABSPATH', dirname( __FILE__ ) . '/' );
 
-// Include environment-specific settings.
-$ddev_settings       = __DIR__ . '/wp-config-ddev.php';
-$production_settings = __DIR__ . '/wp-config-production.php';
-
-if ( ! defined( 'DB_USER' ) ) {
-	// Ưu tiên cấu hình local của ddev khi chạy trong môi trường ddev.
-	if ( getenv( 'IS_DDEV_PROJECT' ) === 'true' && is_readable( $ddev_settings ) ) {
-		require_once $ddev_settings;
-	// Khi deploy lên production (không phải ddev), đọc file wp-config-production.php nếu tồn tại.
-	} elseif ( is_readable( $production_settings ) ) {
-		require_once $production_settings;
-	}
+// Include for settings managed by ddev.
+$ddev_settings = __DIR__ . '/wp-config-ddev.php';
+if ( ! defined( 'DB_USER' ) && getenv( 'IS_DDEV_PROJECT' ) == 'true' && is_readable( $ddev_settings ) ) {
+	require_once( $ddev_settings );
 }
 
 /** Include wp-settings.php */

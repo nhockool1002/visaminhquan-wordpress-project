@@ -70,16 +70,7 @@
 					</div>
 					<br />
 					<div class="vmq-footer-map-wrapper">
-						<iframe 
-							src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.1234567890!2d106.6912!3d10.7890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3a8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2zVMOyYSBuaMOgIFZpZXRQaG9uZSBCdWlsZGluZywgUGjhu5FuZyBSQTksIDY0IFbDtSBUaOG7iSBTw6B1LCBUw6JuIMSQ4bqnaSwgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1234567890123!5m2!1svi!2s" 
-							width="100%" 
-							height="100%" 
-							style="border:0;" 
-							allowfullscreen="" 
-							loading="lazy" 
-							referrerpolicy="no-referrer-when-downgrade"
-							title="Vị trí Công ty TNHH Visa Minh Quân">
-						</iframe>
+						<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.2859615378857!2d106.6932605!3d10.789396399999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x65eeb2b9f23d5489%3A0x56507a758c65df02!2sC%C3%94NG%20TY%20TNHH%20VISA%20MINH%20QU%C3%82N!5e0!3m2!1sen!2s!4v1772706226892!5m2!1sen!2s" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 					</div>
 				</div>
 			</div>

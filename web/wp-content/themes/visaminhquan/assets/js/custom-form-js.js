@@ -11,6 +11,7 @@
         initTestimonialsSlider();
         initFaqAccordion();
         initRelatedNewsSlider();
+        initMobileHamburgerToggleVisibility();
     });
 
     /**
@@ -197,6 +198,34 @@
                 });
             }
         });
+    }
+
+    /**
+     * Ẩn hiện nút .mobile-menu-toggle khi mở/đóng Hamburger menu (vmq-mobile-menu)
+     * - Khi menu mở (có class .is-open): ẩn button
+     * - Khi menu đóng: hiện lại button
+     */
+    function initMobileHamburgerToggleVisibility() {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const menu = document.getElementById('vmq-mobile-menu');
+        if (!toggle || !menu) return;
+
+        const updateVisibility = () => {
+            if (menu.classList.contains('is-open')) {
+                toggle.style.visibility = 'hidden';
+                toggle.style.opacity = '0';
+            } else {
+                toggle.style.visibility = '';
+                toggle.style.opacity = '';
+            }
+        };
+
+        // Cập nhật ban đầu
+        updateVisibility();
+
+        // Theo dõi thay đổi class của menu
+        const observer = new MutationObserver(updateVisibility);
+        observer.observe(menu, { attributes: true, attributeFilter: ['class'] });
     }
 
     // =========================================
@@ -425,26 +454,26 @@
         }
     });
 
-    /* --- SCRIPT XỬ LÝ MODAL KIỂM TRA TỶ LỆ ĐẬU --- */
+    /* --- Nút #mq-btn-check-rate: dẫn đến trang "Nhận danh sách hồ sơ cần nộp", không mở modal --- */
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     var btn = document.getElementById("mq-btn-check-rate");
+    //     if (btn) {
+    //         var url = (typeof vmqThemeConfig !== 'undefined' && vmqThemeConfig.homeUrl)
+    //             ? (vmqThemeConfig.homeUrl.replace(/\/$/, '') + '/nhan-danh-sach-ho-so-can-nop/')
+    //             : '/nhan-danh-sach-ho-so-can-nop/';
+    //         btn.onclick = function(e) {
+    //             e.preventDefault();
+    //             window.location.href = url;
+    //         };
+    //     }
+    // });
+
+    /* --- SCRIPT XỬ LÝ MODAL KIỂM TRA TỶ LỆ ĐẬU (cho các nút khác: .vmq-main-btn, .vmq-btn-cta, .mq-check-rate-btn không phải #mq-btn-check-rate) --- */
     document.addEventListener("DOMContentLoaded", function() {
-        // Lấy các element
         var modal = document.getElementById("mq-visa-modal");
-        var btn = document.getElementById("mq-btn-check-rate");
         var span = document.getElementsByClassName("mq-close-modal")[0];
 
-        // Kiểm tra tồn tại để tránh lỗi
-        if (modal && btn && span) {
-            
-            // Khi click nút mở modal
-            btn.onclick = function(e) {
-                e.preventDefault(); // Ngăn chặn hành vi mặc định nếu là thẻ a
-                modal.classList.add("show"); // Thêm class để hiện modal
-                modal.style.display = "block"; // Fallback display
-                setTimeout(function(){
-                    modal.style.opacity = "1";
-                }, 10);
-            }
-
+        if (modal && span) {
             // Khi click nút đóng (x)
             span.onclick = function() {
                 closeModal();
@@ -457,13 +486,12 @@
                 }
             }
 
-            // Hàm đóng modal
             function closeModal() {
                 modal.style.opacity = "0";
                 setTimeout(function(){
                     modal.classList.remove("show");
                     modal.style.display = "none";
-                }, 300); // Chờ hiệu ứng mờ dần kết thúc
+                }, 300);
             }
         }
     });
@@ -780,6 +808,23 @@
                 subtree: true
             });
         }
+    });
+    
+    $('.vmq-submit').click(function(e) {
+        e.preventDefault();
+        
+        var $btn = $(this);
+        var $form = $btn.closest('form');
+        
+        $btn.prop('disabled', true);
+    
+        setTimeout(function() {
+            $('#vmq-modal-success').css('display', 'flex').hide().fadeIn();
+            
+            setTimeout(function() {
+                $form.off('submit').submit();
+            }, 1500);
+        }, 2000);
     });
 
 })();
