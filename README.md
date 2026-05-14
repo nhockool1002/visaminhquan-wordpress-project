@@ -58,6 +58,30 @@ ddev mysql -e "SELECT * FROM wp_posts LIMIT 10;"
 ```
 Chạy câu lệnh SQL trực tiếp.
 
+### Cập nhật domain cho Custom Links trong menu (MySQL)
+
+Chỉ cập nhật các **Custom Link** trong menu (meta `_menu_item_url`), thay domain production `https://visaminhquan.com.vn/` thành domain DDEV `https://visaminhquan.ddev.site/`.
+
+> Lưu ý: nếu bảng WordPress của bạn không dùng prefix `wp_` thì hãy thay `wp_postmeta` bằng prefix tương ứng (ví dụ: `vmq_postmeta`).
+
+Chạy trong MySQL (ví dụ: `ddev mysql` hoặc phpMyAdmin):
+
+```sql
+-- NÊN backup database trước khi chạy
+START TRANSACTION;
+
+UPDATE wp_postmeta
+SET meta_value = REPLACE(
+    meta_value,
+    'https://visaminhquan.com.vn/',
+    'https://visaminhquan.ddev.site/'
+)
+WHERE meta_key = '_menu_item_url'
+  AND meta_value LIKE 'https://visaminhquan.com.vn/%';
+
+COMMIT;
+```
+
 ### Xem thông tin database
 ```bash
 ddev describe

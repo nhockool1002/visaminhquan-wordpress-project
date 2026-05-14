@@ -87,17 +87,8 @@ function visaminhquan_scripts() {
 		'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 	) );
 
-	// Enqueue theme script
+	// Enqueue theme script (tự nạp Google Translate trong theme.js khi cần)
 	wp_enqueue_script( 'visaminhquan-script', get_template_directory_uri() . '/js/theme.js', array(), '1.0', true );
-
-	// Google Translate Script (load AFTER theme.js, in footer) so callback + DOM are ready
-	wp_enqueue_script(
-		'google-translate',
-		'//translate.google.com/translate_a/element.js?cb=visaminhquanGoogleTranslateInit',
-		array( 'visaminhquan-script' ),
-		null,
-		true
-	);
 
 	// Comment reply script disabled - comments are disabled
 	// if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
@@ -1931,6 +1922,35 @@ function vmq_auto_mailjet_api_integration($contact_form, &$abort, $submission) {
 
     // Chặn gửi mail mặc định
     $abort = true;
+    
+    if ($http_code === 200) {
+        $form_id = $contact_form->id();
+        $redirect_url = '';
+
+        // Phân loại trang đích theo ID của Form
+        switch ($form_id) {
+            case 867: // Thay bằng ID form Visa Mỹ
+                $redirect_url = home_url('/thank-you/?from=lien-he/');
+                break;
+             case 895: // Thay bằng ID form Visa Mỹ
+                $redirect_url = home_url('/thank-you/?from=nds/');
+                break;
+            default:
+                // Trang mặc định cho các form còn lại
+                $redirect_url = home_url('/thank-you/');
+                break;
+        }
+
+        // Thực hiện lệnh redirect gửi về trình duyệt qua AJAX của CF7
+        if ( !empty($redirect_url) ) {
+            add_filter('wpcf7_ajax_json_echo', function($items) use ($redirect_url) {
+                $items['status'] = 'mail_sent'; // Ép trạng thái thành công để hiện màu xanh
+                $items['message'] = 'Gửi yêu cầu thành công! Đang chuyển hướng...';
+                $items['redirect_to'] = $redirect_url;
+                return $items;
+            });
+        }
+    }
 }
 
 
@@ -2491,3 +2511,1073 @@ function mq_execute_image_replacement($html) {
 }
 
 add_filter('pre_option_elementor_css_print_method', function($val) { return 'internal'; });
+
+// 1. Thêm menu "Cài đặt GTM" vào mục "Công cụ" (Tools)
+add_action('admin_menu', 'custom_gtm_settings_menu');
+function custom_gtm_settings_menu() {
+    add_management_page(
+        'Cài đặt Google Tag Manager', // Tiêu đề trang
+        'Cài đặt GTM',               // Tên menu
+        'manage_options',            // Quyền hạn yêu cầu (chỉ admin)
+        'custom-gtm-settings',       // Slug của menu
+        'custom_gtm_settings_page'   // Hàm hiển thị giao diện
+    );
+}
+
+// 2. Đăng ký các cài đặt (Settings)
+add_action('admin_init', 'custom_gtm_register_settings');
+function custom_gtm_register_settings() {
+    register_setting('custom_gtm_options_group', 'custom_gtm_status');
+    register_setting('custom_gtm_options_group', 'custom_gtm_id', 'sanitize_text_field');
+}
+
+// 3. Giao diện trang cài đặt và logic JavaScript cho Radio Button
+function custom_gtm_settings_page() {
+    ?>
+    <div class="wrap">
+        <h1>Cài đặt Google Tag Manager</h1>
+        <form method="post" action="options.php">
+            <?php settings_fields('custom_gtm_options_group'); ?>
+            <table class="form-table">
+                <tr valign="top">
+                    <th scope="row">Trạng thái GTM</th>
+                    <td>
+                        <label>
+                            <input type="radio" name="custom_gtm_status" value="on" <?php checked(get_option('custom_gtm_status'), 'on'); ?> /> Bật
+                        </label><br>
+                        <label>
+                            <input type="radio" name="custom_gtm_status" value="off" <?php checked(get_option('custom_gtm_status', 'off'), 'off'); ?> /> Tắt
+                        </label>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Mã GTM (ID)</th>
+                    <td>
+                        <input type="text" id="custom_gtm_id" name="custom_gtm_id" value="<?php echo esc_attr(get_option('custom_gtm_id')); ?>" placeholder="Ví dụ: GTM-XXXXXXX" class="regular-text" />
+                        <p class="description">Nhập mã Google Tag Manager của bạn.</p>
+                    </td>
+                </tr>
+            </table>
+            <?php submit_button('Lưu thay đổi'); ?>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const radios = document.querySelectorAll('input[name="custom_gtm_status"]');
+            const gtmInput = document.getElementById('custom_gtm_id');
+
+            function toggleGTMInput() {
+                const selectedStatus = document.querySelector('input[name="custom_gtm_status"]:checked');
+                if (selectedStatus && selectedStatus.value === 'on') {
+                    gtmInput.removeAttribute('disabled');
+                } else {
+                    gtmInput.setAttribute('disabled', 'disabled');
+                }
+            }
+
+            // Gắn sự kiện khi thay đổi radio button
+            radios.forEach(function(radio) {
+                radio.addEventListener('change', toggleGTMInput);
+            });
+
+            // Chạy hàm kiểm tra ngay khi load trang
+            toggleGTMInput();
+        });
+    </script>
+    <?php
+}
+
+// 4. Chèn script GTM vào thẻ <head> của website nếu được bật
+add_action('wp_head', 'custom_gtm_insert_head_code', 20);
+function custom_gtm_insert_head_code() {
+    $status = get_option('custom_gtm_status', 'off');
+    $gtm_id = get_option('custom_gtm_id', '');
+
+    // Chỉ chèn nếu trạng thái là Bật và có nhập mã GTM
+    if ($status === 'on' && !empty($gtm_id)) {
+        // Xóa các ký tự không hợp lệ để bảo mật (chỉ giữ lại chữ, số và dấu gạch ngang)
+        $clean_gtm_id = preg_replace('/[^A-Za-z0-9\-]/', '', $gtm_id);
+        ?>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','<?php echo $clean_gtm_id; ?>');</script>
+<?php
+    }
+}
+
+// 5. Chèn thẻ <noscript> vào ngay sau thẻ <body> mở nếu được bật
+add_action('wp_body_open', 'custom_gtm_insert_body_code', 20);
+function custom_gtm_insert_body_code() {
+    $status = get_option('custom_gtm_status', 'off');
+    $gtm_id = get_option('custom_gtm_id', '');
+
+    if ($status === 'on' && !empty($gtm_id)) {
+        $clean_gtm_id = preg_replace('/[^A-Za-z0-9\-]/', '', $gtm_id);
+        ?>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo $clean_gtm_id; ?>"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<?php
+    }
+}
+
+/**
+ * 1. Đăng ký Scripts và Styles cho CodeMirror (Có sẵn trong WP)
+ */
+function enqueue_json_ld_editor_scripts($hook) {
+    if (!in_array($hook, array('post.php', 'post-new.php'))) return;
+
+    // Load thư viện CodeMirror của WordPress
+    wp_enqueue_code_editor(array('type' => 'application/json'));
+    wp_enqueue_script('wp-theme-plugin-editor');
+    wp_enqueue_style('wp-codemirror');
+}
+add_action('admin_enqueue_scripts', 'enqueue_json_ld_editor_scripts');
+
+/**
+ * 2. Tạo Metabox
+ */
+function custom_json_ld_meta_box() {
+    add_meta_box('custom_json_ld_box', '🚀 Custom JSON-LD Schema', 'render_custom_json_ld_box', 'post', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'custom_json_ld_meta_box');
+
+/**
+ * 3. Giao diện Metabox với CodeMirror
+ */
+function render_custom_json_ld_box($post) {
+    $json_ld_value = get_post_meta($post->ID, '_custom_json_ld', true);
+    wp_nonce_field('save_custom_json_ld', 'custom_json_ld_nonce');
+    ?>
+    <style>
+        .json-ld-toolbar { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        .json-ld-toolbar strong { font-size: 13px; color: #333; }
+        .CodeMirror { border: 1px solid #ddd; border-radius: 4px; height: auto; min-height: 250px; font-size: 14px; line-height: 1.5; }
+        .js-ld-tpl { cursor: pointer; border-radius: 4px !important; }
+    </style>
+
+    <div class="json-ld-toolbar">
+        <strong>Chèn nhanh:</strong>
+        <button type="button" class="button js-ld-tpl" data-type="article">📄 Article</button>
+        <button type="button" class="button js-ld-tpl" data-type="faq">❓ FAQ</button>
+        <button type="button" class="button js-ld-tpl" data-type="product">📦 Product</button>
+        <button type="button" class="button" id="clear_json" style="color: #d63638; border-color: #d63638;">Xóa hết</button>
+    </div>
+
+    <textarea id="custom_json_ld_field" name="custom_json_ld_field"><?php echo esc_textarea($json_ld_value); ?></textarea>
+    <p class="description">Code sẽ được tự động làm đẹp (Beautify) khi bạn chọn template.</p>
+
+    <script>
+    jQuery(document).ready(function($) {
+        // Cấu hình CodeMirror
+        var editorSettings = wp.codeEditor.defaultSettings ? _.clone(wp.codeEditor.defaultSettings) : {};
+        editorSettings.codemirror = _.extend(
+            {},
+            editorSettings.codemirror,
+            {
+                indentUnit: 4,
+                tabSize: 4,
+                mode: 'application/json',
+                lineNumbers: true,
+                styleActiveLine: true,
+                matchBrackets: true,
+                theme: 'default'
+            }
+        );
+        var editor = wp.codeEditor.initialize($('#custom_json_ld_field'), editorSettings);
+
+        // Templates dữ liệu
+        const templates = {
+            article: {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": <?php echo json_encode(get_the_title($post->ID)); ?>,
+                "author": { "@type": "Person", "name": "Admin" },
+                "datePublished": "<?php echo get_the_date('c'); ?>"
+            },
+            faq: {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [{
+                    "@type": "Question",
+                    "name": "Câu hỏi mẫu?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Câu trả lời mẫu ở đây." }
+                }]
+            },
+            product: {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": <?php echo json_encode(get_the_title($post->ID)); ?>,
+                "offers": { "@type": "Offer", "price": "1000", "priceCurrency": "USD" }
+            }
+        };
+
+        // Click chọn template
+        $('.js-ld-tpl').on('click', function() {
+            const type = $(this).data('type');
+            const prettyJson = JSON.stringify(templates[type], null, 4);
+            editor.codemirror.setValue(prettyJson);
+        });
+
+        // Nút xóa
+        $('#clear_json').on('click', function() {
+            if(confirm('Bạn có chắc muốn xóa toàn bộ code?')) {
+                editor.codemirror.setValue('');
+            }
+        });
+    });
+    </script>
+    <?php
+}
+
+/**
+ * 4. Lưu dữ liệu (Giữ nguyên logic cũ)
+ */
+function save_custom_json_ld($post_id) {
+    if (!isset($_POST['custom_json_ld_nonce']) || !wp_verify_nonce($_POST['custom_json_ld_nonce'], 'save_custom_json_ld')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (isset($_POST['custom_json_ld_field'])) {
+        update_post_meta($post_id, '_custom_json_ld', $_POST['custom_json_ld_field']);
+    }
+}
+add_action('save_post', 'save_custom_json_ld');
+
+/**
+ * 5. Xuất ra Header (Giữ nguyên logic cũ)
+ */
+add_action('wp_head', function() {
+    if (is_single()) {
+        $json = get_post_meta(get_the_ID(), '_custom_json_ld', true);
+        if ($json) echo "\n<script type=\"application/ld+json\">\n" . $json . "\n</script>\n";
+    }
+});
+
+
+/* ----------------------------------------------------------*/
+/**
+ * Tùy chỉnh Bảo mật Đăng nhập cho Visa Minh Quân
+ * Vị trí: Menu Tools (Công cụ) - Bổ sung tùy chỉnh thời gian khóa
+ */
+
+// 1. Tạo Trang Cài đặt nằm trong mục Tools (Công cụ)
+add_action('admin_menu', 'vsmq_security_tool_menu');
+function vsmq_security_tool_menu() {
+    add_submenu_page(
+        'tools.php',
+        'Cài đặt Bảo mật',
+        'Cài đặt Bảo mật',
+        'manage_options',
+        'vsmq-security-settings',
+        'vsmq_security_settings_page'
+    );
+}
+
+// 2. Giao diện trang cài đặt
+function vsmq_security_settings_page() {
+    if (isset($_POST['vsmq_save_settings'])) {
+        update_option('vsmq_max_retries', intval($_POST['max_retries']));
+        update_option('vsmq_lockout_time', intval($_POST['lockout_time']));
+        update_option('vsmq_whitelist_ips', sanitize_text_field($_POST['whitelist_ips']));
+        echo '<div class="updated"><p>✅ Đã cập nhật cấu hình bảo mật thành công!</p></div>';
+    }
+
+    $max_retries = get_option('vsmq_max_retries', 5);
+    $lockout_time = get_option('vsmq_lockout_time', 60); // Mặc định 60 phút
+    $whitelist_ips = get_option('vsmq_whitelist_ips', '');
+
+    echo '<div class="wrap">';
+    echo '<h1>🛡️ Cấu hình Bảo mật Đăng nhập - Visa Minh Quân</h1>';
+    echo '<form method="post" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 5px; max-width: 800px;">';
+    echo '<table class="form-table">';
+    
+    // Số lần thử
+    echo '<tr>
+            <th scope="row"><label for="max_retries">Số lần đăng nhập sai tối đa</label></th>
+            <td>
+                <input type="number" name="max_retries" id="max_retries" value="'.$max_retries.'" class="small-text" /> lần
+            </td>
+          </tr>';
+
+    // THÊM MỚI: Thời gian khóa
+    echo '<tr>
+            <th scope="row"><label for="lockout_time">Thời gian tạm khóa IP</label></th>
+            <td>
+                <input type="number" name="lockout_time" id="lockout_time" value="'.$lockout_time.'" class="small-text" /> phút
+                <p class="description">IP vi phạm sẽ không thể đăng nhập trong khoảng thời gian này.</p>
+            </td>
+          </tr>';
+    
+    // IP Whitelist
+    echo '<tr>
+            <th scope="row"><label for="whitelist_ips">Danh sách IP Whitelist</label></th>
+            <td>
+                <textarea name="whitelist_ips" id="whitelist_ips" rows="5" class="large-text" placeholder="Ví dụ: 113.161.xx.xx, 172.20.15.17">'.$whitelist_ips.'</textarea>
+                <p class="description">Các IP văn phòng, team SEO (cách nhau bởi dấu phẩy) sẽ không bao giờ bị khóa.</p>
+            </td>
+          </tr>';
+          
+    echo '</table>';
+    echo '<p class="submit"><input type="submit" name="vsmq_save_settings" class="button button-primary" value="Lưu cấu hình" /></p>';
+    echo '</form></div>';
+}
+
+// 3. Logic xử lý bảo mật
+add_filter('authenticate', 'vsmq_enforce_security_logic', 30, 3);
+function vsmq_enforce_security_logic($user, $username, $password) {
+    $user_ip = $_SERVER['REMOTE_ADDR'];
+    $raw_whitelist = get_option('vsmq_whitelist_ips', '');
+    $whitelist_array = array_filter(array_map('trim', explode(',', $raw_whitelist)));
+
+    // 1. Kiểm tra Whitelist
+    if (in_array($user_ip, $whitelist_array)) {
+        return $user;
+    }
+
+    $transient_key = 'vsmq_fail_' . str_replace('.', '_', $user_ip);
+    $fail_count = (int)get_transient($transient_key);
+    $limit = (int)get_option('vsmq_max_retries', 5);
+    $lockout_minutes = (int)get_option('vsmq_lockout_time', 60);
+
+    // 2. Kiểm tra nếu đang trong thời gian bị khóa
+    if ($fail_count >= $limit) {
+        return new WP_Error('vsmq_locked', '<strong>BẢO MẬT:</strong> Bạn đã nhập sai quá '.$limit.' lần. Vui lòng thử lại sau '.$lockout_minutes.' phút.');
+    }
+
+    // 3. Xử lý khi đăng nhập sai
+    if (is_wp_error($user) && !empty($username)) {
+        $fail_count++;
+        // Lưu số lần sai với thời gian hết hạn tùy chỉnh (chuyển phút sang giây)
+        set_transient($transient_key, $fail_count, $lockout_minutes * MINUTE_IN_SECONDS);
+    }
+
+    return $user;
+}
+
+
+
+/**
+ * Tạo trang cài đặt Footer và Zalo cho Visa Minh Quân
+ */
+add_action('admin_menu', 'vmq_footer_settings_menu');
+function vmq_footer_settings_menu() {
+    add_menu_page('Cài đặt Thông tin', 'Cài đặt Thông tin', 'manage_options', 'vmq-footer-settings', 'vmq_footer_settings_page', 'dashicons-layout', 60);
+}
+
+add_action('admin_init', 'vmq_footer_settings_init');
+function vmq_footer_settings_init() {
+    register_setting('vmq_footer_group', 'vmq_footer_data');
+
+    // Section 1: Thông tin liên hệ & Chính sách
+    add_settings_section('vmq_footer_main_section', 'Thông tin liên hệ & Chính sách', null, 'vmq-footer-settings');
+    $fields = [
+        'company_name' => 'Tên công ty (CÔNG TY TNHH VISA MINH QUÂN)',
+        'mst'          => 'Mã số thuế',
+        'address'      => 'Địa chỉ',
+        'hotline'      => 'Hotline hiển thị',
+        'hotline_tel'  => 'Hotline gọi (Chỉ số)',
+        'tong_dai'     => 'Tổng đài hiển thị',
+        'tong_dai_tel' => 'Tổng đài gọi (Chỉ số)',
+        'email'        => 'Email',
+        'link_faq'     => 'Link Câu hỏi thường gặp',
+        'link_policy'  => 'Link Chính sách bảo mật',
+        'link_tos'   => 'Link Điều khoản dịch vụ',
+        'maps_iframe'  => 'Iframe Google Maps',
+    ];
+    foreach ($fields as $id => $title) {
+        add_settings_field($id, $title, 'vmq_footer_render_field', 'vmq-footer-settings', 'vmq_footer_main_section', ['id' => $id]);
+    }
+
+    // Section 2: Mạng xã hội
+    add_settings_section('vmq_social_section', 'Mạng xã hội (Links)', null, 'vmq-footer-settings');
+    $socials = [
+        'social_yt' => 'Link Youtube',
+        'social_fb' => 'Link Facebook',
+        'social_tt' => 'Link Tiktok',
+        'social_zl' => 'Link Zalo',
+    ];
+    foreach ($socials as $id => $title) {
+        add_settings_field($id, $title, 'vmq_footer_render_field', 'vmq-footer-settings', 'vmq_social_section', ['id' => $id]);
+    }
+
+    // Section 3: Cấu hình Zalo Chat Widget
+    add_settings_section('vmq_zalo_section', 'Cấu hình Zalo Chat Widget', null, 'vmq-footer-settings');
+    $zalo_fields = [
+        'zalo_enable'  => 'Bật Zalo Chat (Điền "on" để hiện)',
+        'zalo_oa_id'   => 'Zalo OA ID',
+        'zalo_welcome' => 'Tin nhắn chào mừng',
+    ];
+    foreach ($zalo_fields as $id => $title) {
+        add_settings_field($id, $title, 'vmq_footer_render_field', 'vmq-footer-settings', 'vmq_zalo_section', ['id' => $id]);
+    }
+
+    // Section 4: Sticky Bar
+    add_settings_section('vmq_sticky_section', 'Cấu hình Sticky Footer Bar', null, 'vmq-footer-settings');
+    $sticky_fields = [
+        'sticky_1_label' => 'Cụm 1: Nhãn',
+        'sticky_1_link'  => 'Cụm 1: Link',
+        'sticky_1_svg'   => 'Cụm 1: SVG Icon',
+        'sticky_2_label' => 'Cụm 2: Nhãn',
+        'sticky_2_link'  => 'Cụm 2: Link',
+        'sticky_2_svg'   => 'Cụm 2: SVG Icon',
+    ];
+    foreach ($sticky_fields as $id => $title) {
+        add_settings_field($id, $title, 'vmq_footer_render_field', 'vmq-footer-settings', 'vmq_sticky_section', ['id' => $id, 'type' => (strpos($id, 'svg') !== false ? 'textarea' : 'text')]);
+    }
+}
+
+function vmq_footer_render_field($args) {
+    $options = get_option('vmq_footer_data');
+    $id = $args['id'];
+    $value = isset($options[$id]) ? $options[$id] : '';
+    $type = isset($args['type']) ? $args['type'] : 'text';
+
+    if ($type === 'textarea') {
+        echo "<textarea name='vmq_footer_data[$id]' rows='5' class='large-text'>" . esc_textarea($value) . "</textarea>";
+    } else {
+        echo "<input type='text' name='vmq_footer_data[$id]' value='" . esc_attr($value) . "' class='large-text' />";
+    }
+}
+
+function vmq_footer_settings_page() {
+    ?>
+    <div class="wrap">
+        <h1>Cài đặt Thông tin Website</h1>
+        <form action="options.php" method="post">
+            <?php
+            settings_fields('vmq_footer_group');
+            do_settings_sections('vmq-footer-settings');
+            submit_button();
+            ?>
+        </form>
+    </div>
+    <?php
+}
+
+add_shortcode('vmq_google_map', 'vmq_display_google_map_shortcode');
+function vmq_display_google_map_shortcode() {
+    $footer_opts = get_option('vmq_footer_data');
+    $map_code = isset($footer_opts['maps_iframe']) ? $footer_opts['maps_iframe'] : '';
+    if (empty($map_code)) {
+        $map_code = '<iframe src="https://www.google.com/maps/embed?pb=..." width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>';
+    }
+    return $map_code;
+}
+
+/**
+ * ============================================
+ * Cẩm nang theo điểm đến (Admin + Shortcode)
+ * ============================================
+ */
+
+function vmq_destination_guide_get_default_settings() {
+	return array(
+		'title'            => 'Cẩm nang theo điểm đến',
+		'banner_enabled'   => 0,
+		'banner_image_id'  => 0,
+		'banner_image_url' => '',
+		'banner_link'      => '',
+		'groups'           => array(
+			array(
+				'label'    => 'Châu Á',
+				'url'      => '',
+				'children' => array(
+					array(
+						'label' => 'Ấn Độ',
+						'url'   => '#',
+					),
+					array(
+						'label' => 'Hàn Quốc',
+						'url'   => '#',
+					),
+				),
+			),
+			array(
+				'label'    => 'Châu Âu',
+				'url'      => '',
+				'children' => array(),
+			),
+			array(
+				'label'    => 'Châu Mỹ',
+				'url'      => '',
+				'children' => array(),
+			),
+			array(
+				'label'    => 'Châu Úc',
+				'url'      => '',
+				'children' => array(),
+			),
+			array(
+				'label'    => 'Châu Phi',
+				'url'      => '',
+				'children' => array(),
+			),
+		),
+	);
+}
+
+function vmq_destination_guide_get_settings() {
+	$defaults = vmq_destination_guide_get_default_settings();
+	$options  = get_option( 'vmq_destination_guide_settings', array() );
+
+	if ( ! is_array( $options ) ) {
+		return $defaults;
+	}
+
+	$title  = isset( $options['title'] ) ? sanitize_text_field( $options['title'] ) : $defaults['title'];
+	$groups = isset( $options['groups'] ) && is_array( $options['groups'] ) ? $options['groups'] : $defaults['groups'];
+	$banner_enabled = isset( $options['banner_enabled'] ) ? (int) (bool) $options['banner_enabled'] : (int) $defaults['banner_enabled'];
+	$banner_image_id = isset( $options['banner_image_id'] ) ? absint( $options['banner_image_id'] ) : (int) $defaults['banner_image_id'];
+	$banner_image_url = isset( $options['banner_image_url'] ) ? esc_url_raw( $options['banner_image_url'] ) : $defaults['banner_image_url'];
+	$banner_link = isset( $options['banner_link'] ) ? esc_url_raw( $options['banner_link'] ) : $defaults['banner_link'];
+
+	return array(
+		'title'            => $title ? $title : $defaults['title'],
+		'banner_enabled'   => $banner_enabled,
+		'banner_image_id'  => $banner_image_id,
+		'banner_image_url' => $banner_image_url,
+		'banner_link'      => $banner_link,
+		'groups'           => $groups,
+	);
+}
+
+function vmq_destination_guide_sanitize_settings( $input ) {
+	$defaults = vmq_destination_guide_get_default_settings();
+	$current  = get_option( 'vmq_destination_guide_settings', array() );
+
+	$output = array(
+		'title'            => $defaults['title'],
+		'banner_enabled'   => isset( $current['banner_enabled'] ) ? (int) (bool) $current['banner_enabled'] : (int) $defaults['banner_enabled'],
+		'banner_image_id'  => isset( $current['banner_image_id'] ) ? absint( $current['banner_image_id'] ) : (int) $defaults['banner_image_id'],
+		'banner_image_url' => isset( $current['banner_image_url'] ) ? esc_url_raw( $current['banner_image_url'] ) : $defaults['banner_image_url'],
+		'banner_link'      => isset( $current['banner_link'] ) ? esc_url_raw( $current['banner_link'] ) : $defaults['banner_link'],
+		'groups'           => array(),
+	);
+
+	if ( isset( $input['title'] ) ) {
+		$output['title'] = sanitize_text_field( $input['title'] );
+	} elseif ( isset( $current['title'] ) ) {
+		$output['title'] = sanitize_text_field( $current['title'] );
+	}
+
+	$output['banner_enabled'] = ! empty( $input['banner_enabled'] ) ? 1 : 0;
+	$output['banner_image_id'] = isset( $input['banner_image_id'] ) ? absint( $input['banner_image_id'] ) : 0;
+	$output['banner_image_url'] = isset( $input['banner_image_url'] ) ? esc_url_raw( $input['banner_image_url'] ) : '';
+	$output['banner_link'] = isset( $input['banner_link'] ) ? esc_url_raw( $input['banner_link'] ) : '';
+
+	if ( empty( $input['groups'] ) || ! is_array( $input['groups'] ) ) {
+		// Không làm mất dữ liệu cũ nếu payload bị thiếu groups khi submit.
+		if ( ! empty( $current['groups'] ) && is_array( $current['groups'] ) ) {
+			$output['groups'] = $current['groups'];
+		}
+		return $output;
+	}
+
+	foreach ( $input['groups'] as $group ) {
+		if ( ! is_array( $group ) ) {
+			continue;
+		}
+
+		$label = isset( $group['label'] ) ? sanitize_text_field( $group['label'] ) : '';
+		$url   = isset( $group['url'] ) ? esc_url_raw( $group['url'] ) : '';
+
+		if ( '' === $label ) {
+			continue;
+		}
+
+		$children = array();
+
+		// Ưu tiên cấu trúc textarea children_raw trong admin hiện tại.
+		if ( isset( $group['children_raw'] ) ) {
+			$children_raw = (string) $group['children_raw'];
+			$lines        = preg_split( '/\r\n|\r|\n/', $children_raw );
+
+			if ( is_array( $lines ) ) {
+				foreach ( $lines as $line ) {
+					$line = trim( $line );
+					if ( '' === $line ) {
+						continue;
+					}
+
+					$parts       = array_map( 'trim', explode( '|', $line, 2 ) );
+					$child_label = isset( $parts[0] ) ? sanitize_text_field( $parts[0] ) : '';
+					$child_url   = isset( $parts[1] ) ? esc_url_raw( $parts[1] ) : '';
+
+					if ( '' === $child_label ) {
+						continue;
+					}
+
+					$children[] = array(
+						'label' => $child_label,
+						'url'   => $child_url,
+					);
+				}
+			}
+		} elseif ( ! empty( $group['children'] ) && is_array( $group['children'] ) ) {
+			// Tương thích ngược nếu có payload dạng children[].
+			foreach ( $group['children'] as $child ) {
+				if ( ! is_array( $child ) ) {
+					continue;
+				}
+
+				$child_label = isset( $child['label'] ) ? sanitize_text_field( $child['label'] ) : '';
+				$child_url   = isset( $child['url'] ) ? esc_url_raw( $child['url'] ) : '';
+
+				if ( '' === $child_label ) {
+					continue;
+				}
+
+				$children[] = array(
+					'label' => $child_label,
+					'url'   => $child_url,
+				);
+			}
+		}
+
+		$output['groups'][] = array(
+			'label'    => $label,
+			'url'      => $url,
+			'children' => $children,
+		);
+	}
+
+	// Nếu parse xong bị rỗng ngoài ý muốn, giữ lại dữ liệu cũ thay vì ghi đè mất hết.
+	if ( empty( $output['groups'] ) && ! empty( $current['groups'] ) && is_array( $current['groups'] ) ) {
+		$output['groups'] = $current['groups'];
+	}
+
+	return $output;
+}
+
+function vmq_destination_guide_register_settings() {
+	register_setting(
+		'vmq_destination_guide_group',
+		'vmq_destination_guide_settings',
+		'vmq_destination_guide_sanitize_settings'
+	);
+}
+add_action( 'admin_init', 'vmq_destination_guide_register_settings' );
+
+function vmq_destination_guide_add_admin_page() {
+	add_options_page(
+		'Widget Cẩm Nang',
+		'Widget Cẩm Nang',
+		'manage_options',
+		'vmq-destination-guide',
+		'vmq_destination_guide_render_admin_page'
+	);
+}
+add_action( 'admin_menu', 'vmq_destination_guide_add_admin_page' );
+
+function vmq_destination_guide_render_admin_group_row( $index, $group ) {
+	$label = isset( $group['label'] ) ? $group['label'] : '';
+	$url   = isset( $group['url'] ) ? $group['url'] : '';
+
+	$children_raw = '';
+	if ( ! empty( $group['children'] ) && is_array( $group['children'] ) ) {
+		$lines = array();
+		foreach ( $group['children'] as $child ) {
+			$child_label = isset( $child['label'] ) ? $child['label'] : '';
+			$child_url   = isset( $child['url'] ) ? $child['url'] : '';
+			if ( '' === $child_label ) {
+				continue;
+			}
+			$lines[] = '' !== $child_url ? $child_label . '|' . $child_url : $child_label;
+		}
+		$children_raw = implode( "\n", $lines );
+	}
+	?>
+	<div class="vmq-dg-group-item">
+		<div class="vmq-dg-group-header">
+			<strong>Item mẹ</strong>
+			<button type="button" class="button-link-delete vmq-dg-remove-group">Xóa</button>
+		</div>
+		<p>
+			<label>Tên item mẹ</label><br />
+			<input type="text" class="regular-text" name="vmq_destination_guide_settings[groups][<?php echo esc_attr( $index ); ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Ví dụ: Châu Á" />
+		</p>
+		<p>
+			<label>Link item mẹ (không bắt buộc)</label><br />
+			<input type="url" class="large-text" name="vmq_destination_guide_settings[groups][<?php echo esc_attr( $index ); ?>][url]" value="<?php echo esc_attr( $url ); ?>" placeholder="https://example.com/chau-a" />
+		</p>
+		<p>
+			<label>Item con (mỗi dòng: Tên|Link)</label><br />
+			<textarea class="large-text code" rows="6" name="vmq_destination_guide_settings[groups][<?php echo esc_attr( $index ); ?>][children_raw]" placeholder="Ấn Độ|https://example.com/an-do&#10;Hàn Quốc|https://example.com/han-quoc"><?php echo esc_textarea( $children_raw ); ?></textarea>
+		</p>
+	</div>
+	<?php
+}
+
+function vmq_destination_guide_render_admin_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	wp_enqueue_media();
+
+	$settings = vmq_destination_guide_get_settings();
+	$groups   = isset( $settings['groups'] ) && is_array( $settings['groups'] ) ? $settings['groups'] : array();
+	?>
+	<div class="wrap">
+		<h1>Widget Cẩm Nang</h1>
+		<p class="vmq-dg-admin-intro">Quản lý tiêu đề và danh sách item mẹ/con cho shortcode <code>[vmq_destination_guide]</code>.</p>
+
+		<form method="post" action="options.php" class="vmq-dg-admin-form">
+			<?php settings_fields( 'vmq_destination_guide_group' ); ?>
+
+			<div class="vmq-dg-admin-card">
+				<div class="vmq-dg-admin-card__title">Cấu hình chung</div>
+				<div class="vmq-dg-field-grid">
+					<div class="vmq-dg-field">
+						<label for="vmq_dg_title">Tiêu đề khối</label>
+						<input id="vmq_dg_title" type="text" class="regular-text" name="vmq_destination_guide_settings[title]" value="<?php echo esc_attr( $settings['title'] ); ?>" />
+					</div>
+				</div>
+			</div>
+
+			<div class="vmq-dg-admin-card">
+				<div class="vmq-dg-admin-card__title">Banner bên dưới widget</div>
+				<div class="vmq-dg-field-grid">
+					<div class="vmq-dg-field">
+						<label>
+							<input type="checkbox" id="vmq_dg_banner_enabled" name="vmq_destination_guide_settings[banner_enabled]" value="1" <?php checked( ! empty( $settings['banner_enabled'] ) ); ?> />
+							Bật banner quảng cáo bên dưới widget
+						</label>
+					</div>
+					<div class="vmq-dg-field">
+						<label for="vmq_dg_banner_link">Liên kết banner (không bắt buộc)</label>
+						<input id="vmq_dg_banner_link" type="url" class="large-text" name="vmq_destination_guide_settings[banner_link]" value="<?php echo esc_attr( $settings['banner_link'] ); ?>" placeholder="https://example.com/landing-page" />
+					</div>
+					<div class="vmq-dg-field">
+						<label>Ảnh banner</label>
+						<input type="hidden" id="vmq_dg_banner_image_id" name="vmq_destination_guide_settings[banner_image_id]" value="<?php echo esc_attr( (string) $settings['banner_image_id'] ); ?>" />
+						<input type="text" id="vmq_dg_banner_image_url" class="large-text" name="vmq_destination_guide_settings[banner_image_url]" value="<?php echo esc_attr( $settings['banner_image_url'] ); ?>" readonly />
+						<div class="vmq-dg-banner-actions">
+							<button type="button" class="button button-secondary" id="vmq_dg_pick_banner_image">Chọn ảnh từ thư viện</button>
+							<button type="button" class="button" id="vmq_dg_remove_banner_image">Xóa ảnh</button>
+						</div>
+						<div class="vmq-dg-banner-preview-wrap">
+							<img id="vmq_dg_banner_preview" src="<?php echo esc_url( $settings['banner_image_url'] ); ?>" alt="Banner preview" <?php echo empty( $settings['banner_image_url'] ) ? 'style="display:none;"' : ''; ?> />
+							<div id="vmq_dg_banner_placeholder" class="vmq-dg-banner-placeholder" <?php echo ! empty( $settings['banner_image_url'] ) ? 'style="display:none;"' : ''; ?>>Placeholder banner (chưa chọn ảnh)</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="vmq-dg-admin-card">
+				<div class="vmq-dg-admin-card__head">
+					<div class="vmq-dg-admin-card__title">Danh sách item mẹ / con</div>
+					<button type="button" class="button button-secondary" id="vmq-dg-add-group">+ Thêm item mẹ</button>
+				</div>
+				<div id="vmq-dg-groups-wrap">
+					<?php
+					foreach ( $groups as $index => $group ) {
+						vmq_destination_guide_render_admin_group_row( $index, $group );
+					}
+					?>
+				</div>
+			</div>
+
+			<?php submit_button( 'Lưu cài đặt' ); ?>
+		</form>
+	</div>
+
+	<style>
+		.vmq-dg-admin-intro {
+			margin: 6px 0 12px;
+		}
+		.vmq-dg-admin-form {
+			max-width: 1100px;
+		}
+		.vmq-dg-admin-card {
+			border: 1px solid #dcdcde;
+			border-radius: 8px;
+			padding: 12px;
+			margin: 0 0 12px;
+			background: #fff;
+		}
+		.vmq-dg-admin-card__head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+		.vmq-dg-admin-card__title {
+			font-size: 14px;
+			font-weight: 700;
+			margin: 0 0 8px;
+		}
+		.vmq-dg-field-grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 10px;
+		}
+		.vmq-dg-field label {
+			display: inline-block;
+			font-weight: 600;
+			margin-bottom: 4px;
+		}
+		.vmq-dg-group-item {
+			border: 1px solid #dcdcde;
+			border-radius: 6px;
+			padding: 10px 10px 8px;
+			margin: 0 0 8px;
+			background: #fcfcfc;
+		}
+		.vmq-dg-group-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 6px;
+		}
+		#vmq-dg-groups-wrap label {
+			font-weight: 600;
+			margin-bottom: 3px;
+			display: inline-block;
+		}
+		#vmq-dg-groups-wrap p {
+			margin: 0 0 8px;
+		}
+		#vmq-dg-groups-wrap p:last-child {
+			margin-bottom: 0;
+		}
+		#vmq-dg-groups-wrap input[type="text"],
+		#vmq-dg-groups-wrap input[type="url"],
+		#vmq-dg-groups-wrap textarea {
+			width: 100%;
+			max-width: 100%;
+		}
+		.vmq-dg-banner-actions {
+			margin-top: 8px;
+			display: flex;
+			gap: 8px;
+		}
+		.vmq-dg-banner-preview-wrap {
+			margin-top: 10px;
+		}
+		#vmq_dg_banner_preview {
+			display: block;
+			width: 100%;
+			max-width: 360px;
+			height: auto;
+			border: 1px solid #dcdcde;
+			border-radius: 6px;
+		}
+		.vmq-dg-banner-placeholder {
+			width: 100%;
+			max-width: 360px;
+			min-height: 120px;
+			border: 1px dashed #b6bcc5;
+			background: #f8f9fb;
+			color: #5c6670;
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 13px;
+		}
+	</style>
+
+	<script>
+	(function () {
+		const wrap = document.getElementById('vmq-dg-groups-wrap');
+		const addBtn = document.getElementById('vmq-dg-add-group');
+		const pickBannerBtn = document.getElementById('vmq_dg_pick_banner_image');
+		const removeBannerBtn = document.getElementById('vmq_dg_remove_banner_image');
+		const bannerImageIdInput = document.getElementById('vmq_dg_banner_image_id');
+		const bannerImageUrlInput = document.getElementById('vmq_dg_banner_image_url');
+		const bannerPreview = document.getElementById('vmq_dg_banner_preview');
+		const bannerPlaceholder = document.getElementById('vmq_dg_banner_placeholder');
+		if (!wrap || !addBtn) return;
+
+		function getNextIndex() {
+			const rows = wrap.querySelectorAll('.vmq-dg-group-item');
+			return rows.length;
+		}
+
+		function buildGroupRow(index) {
+			const div = document.createElement('div');
+			div.className = 'vmq-dg-group-item';
+			div.innerHTML =
+				'<div class="vmq-dg-group-header">' +
+					'<strong>Item mẹ</strong>' +
+					'<button type="button" class="button-link-delete vmq-dg-remove-group">Xóa</button>' +
+				'</div>' +
+				'<p><label>Tên item mẹ</label><br />' +
+					'<input type="text" class="regular-text" name="vmq_destination_guide_settings[groups][' + index + '][label]" placeholder="Ví dụ: Châu Á" />' +
+				'</p>' +
+				'<p><label>Link item mẹ (không bắt buộc)</label><br />' +
+					'<input type="url" class="large-text" name="vmq_destination_guide_settings[groups][' + index + '][url]" placeholder="https://example.com/chau-a" />' +
+				'</p>' +
+				'<p><label>Item con (mỗi dòng: Tên|Link)</label><br />' +
+					'<textarea class="large-text code" rows="6" name="vmq_destination_guide_settings[groups][' + index + '][children_raw]" placeholder="Ấn Độ|https://example.com/an-do&#10;Hàn Quốc|https://example.com/han-quoc"></textarea>' +
+				'</p>';
+			return div;
+		}
+
+		addBtn.addEventListener('click', function () {
+			wrap.appendChild(buildGroupRow(getNextIndex()));
+		});
+
+		wrap.addEventListener('click', function (event) {
+			if (!event.target.classList.contains('vmq-dg-remove-group')) return;
+			const row = event.target.closest('.vmq-dg-group-item');
+			if (row) row.remove();
+		});
+
+		function updateBannerPreview(url) {
+			if (!bannerPreview || !bannerPlaceholder) return;
+			if (url) {
+				bannerPreview.src = url;
+				bannerPreview.style.display = 'block';
+				bannerPlaceholder.style.display = 'none';
+			} else {
+				bannerPreview.src = '';
+				bannerPreview.style.display = 'none';
+				bannerPlaceholder.style.display = 'flex';
+			}
+		}
+
+		if (pickBannerBtn && bannerImageIdInput && bannerImageUrlInput) {
+			pickBannerBtn.addEventListener('click', function () {
+				if (typeof wp === 'undefined' || !wp.media) return;
+				const frame = wp.media({
+					title: 'Chọn ảnh banner',
+					button: { text: 'Dùng ảnh này' },
+					library: { type: 'image' },
+					multiple: false
+				});
+
+				frame.on('select', function () {
+					const attachment = frame.state().get('selection').first().toJSON();
+					bannerImageIdInput.value = attachment.id || '';
+					bannerImageUrlInput.value = attachment.url || '';
+					updateBannerPreview(attachment.url || '');
+				});
+
+				frame.open();
+			});
+		}
+
+		if (removeBannerBtn && bannerImageIdInput && bannerImageUrlInput) {
+			removeBannerBtn.addEventListener('click', function () {
+				bannerImageIdInput.value = '';
+				bannerImageUrlInput.value = '';
+				updateBannerPreview('');
+			});
+		}
+	})();
+	</script>
+	<?php
+}
+
+function vmq_destination_guide_render_shortcode() {
+	$settings = vmq_destination_guide_get_settings();
+	$groups   = isset( $settings['groups'] ) && is_array( $settings['groups'] ) ? $settings['groups'] : array();
+
+	if ( empty( $groups ) ) {
+		return '';
+	}
+
+	wp_enqueue_style(
+		'vmq-destination-guide',
+		get_template_directory_uri() . '/assets/css/destination-guide.css',
+		array(),
+		(string) filemtime( get_template_directory() . '/assets/css/destination-guide.css' )
+	);
+	wp_enqueue_script(
+		'vmq-destination-guide',
+		get_template_directory_uri() . '/assets/js/destination-guide.js',
+		array(),
+		(string) filemtime( get_template_directory() . '/assets/js/destination-guide.js' ),
+		true
+	);
+
+	ob_start();
+	?>
+	<div class="vmq-destination-guide-stack">
+		<div class="vmq-destination-guide" data-vmq-destination-guide>
+			<div class="vmq-destination-guide__head">
+				<h3 class="vmq-destination-guide__title"><?php echo esc_html( $settings['title'] ); ?></h3>
+			</div>
+			<div class="vmq-destination-guide__body">
+				<?php foreach ( $groups as $group ) : ?>
+					<?php
+					$group_label = isset( $group['label'] ) ? $group['label'] : '';
+					$group_url   = isset( $group['url'] ) ? $group['url'] : '';
+					$children    = isset( $group['children'] ) && is_array( $group['children'] ) ? $group['children'] : array();
+					if ( '' === $group_label ) {
+						continue;
+					}
+					$has_children = ! empty( $children );
+					?>
+					<div class="vmq-dg-item<?php echo $has_children ? ' has-children' : ''; ?>">
+						<button type="button" class="vmq-dg-item__trigger" aria-expanded="false">
+							<span class="vmq-dg-item__label">
+								<?php if ( '' !== $group_url ) : ?>
+									<a href="<?php echo esc_url( $group_url ); ?>"><?php echo esc_html( $group_label ); ?></a>
+								<?php else : ?>
+									<?php echo esc_html( $group_label ); ?>
+								<?php endif; ?>
+							</span>
+							<span class="vmq-dg-item__icon" aria-hidden="true"></span>
+						</button>
+
+						<?php if ( $has_children ) : ?>
+							<div class="vmq-dg-item__panel" hidden>
+								<ul class="vmq-dg-sublist">
+									<?php foreach ( $children as $child ) : ?>
+										<?php
+										$child_label = isset( $child['label'] ) ? $child['label'] : '';
+										$child_url   = isset( $child['url'] ) ? $child['url'] : '';
+										if ( '' === $child_label ) {
+											continue;
+										}
+										?>
+										<li class="vmq-dg-sublist__item">
+											<?php if ( '' !== $child_url ) : ?>
+												<a href="<?php echo esc_url( $child_url ); ?>"><?php echo esc_html( $child_label ); ?></a>
+											<?php else : ?>
+												<span><?php echo esc_html( $child_label ); ?></span>
+											<?php endif; ?>
+										</li>
+									<?php endforeach; ?>
+								</ul>
+							</div>
+						<?php endif; ?>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+
+		<?php if ( ! empty( $settings['banner_enabled'] ) ) : ?>
+			<?php
+			$banner_image_url = isset( $settings['banner_image_url'] ) ? $settings['banner_image_url'] : '';
+			$banner_link      = isset( $settings['banner_link'] ) ? $settings['banner_link'] : '';
+			$banner_has_link  = ! empty( $banner_link );
+			$banner_tag       = $banner_has_link ? 'a' : 'div';
+			?>
+			<div class="vmq-destination-guide-banner-card">
+				<<?php echo esc_html( $banner_tag ); ?>
+					class="vmq-dg-banner"
+					<?php if ( $banner_has_link ) : ?>
+						href="<?php echo esc_url( $banner_link ); ?>"
+						target="_blank"
+						rel="noopener noreferrer"
+					<?php endif; ?>
+				>
+					<?php if ( ! empty( $banner_image_url ) ) : ?>
+						<img src="<?php echo esc_url( $banner_image_url ); ?>" alt="Banner quảng cáo" loading="lazy" />
+					<?php else : ?>
+						<span class="vmq-dg-banner-placeholder">Banner quảng cáo</span>
+					<?php endif; ?>
+				</<?php echo esc_html( $banner_tag ); ?>>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'vmq_destination_guide', 'vmq_destination_guide_render_shortcode' );

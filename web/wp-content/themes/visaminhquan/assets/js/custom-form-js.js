@@ -499,7 +499,8 @@
     /* --- SCRIPT XỬ LÝ BUTTON VMQ-MAIN-BTN, VMQ-BTN-CTA VÀ MQ-CHECK-RATE-BTN MỞ MODAL KIỂM TRA TỶ LỆ ĐẬU VISA --- */
     document.addEventListener("DOMContentLoaded", function() {
         // Tìm tất cả button có class vmq-main-btn, vmq-btn-cta hoặc mq-check-rate-btn
-        const allButtons = document.querySelectorAll('.vmq-main-btn, .vmq-btn-cta, .mq-check-rate-btn');
+        //const allButtons = document.querySelectorAll('.vmq-main-btn, .vmq-btn-cta, .mq-check-rate-btn');
+        const allButtons = document.querySelectorAll('.vmq-main-btn, .mq-check-rate-btn');
         
         // Lọc bỏ button có ID mq-btn-check-rate (đã được xử lý bởi code cũ ở trên)
         const mainButtons = Array.from(allButtons).filter(function(btn) {
@@ -810,22 +811,191 @@
         }
     });
     
-    $('.vmq-submit').click(function(e) {
-        e.preventDefault();
-        
-        var $btn = $(this);
-        var $form = $btn.closest('form');
-        
-        $btn.prop('disabled', true);
     
-        setTimeout(function() {
-            $('#vmq-modal-success').css('display', 'flex').hide().fadeIn();
+    document.querySelectorAll('.vmq-btn-cta').forEach(button => {
+        button.addEventListener('click', function() {
+            window.location.href = 'https://visaminhquan.com.vn/category/kiem-tra-ty-le-dau-visa/';
+        });
+    });
+
+    // Lấy tất cả các phần tử có class 'vmq-submit' và gắn sự kiện click cho từng phần tử
+    document.querySelectorAll('.vmq-submit').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); // Ngăn hành vi submit mặc định
+            
+            var form = btn.closest('form'); // Tìm form cha gần nhất
+            btn.disabled = true;            // Vô hiệu hóa nút (!0 tương đương với true)
+            
+            if (form && form.classList.contains('vmq-hero-form-custom')) {
+                var isValid = true;
+                var requiredInputs = form.querySelectorAll('input[required]');
+                var checkboxes = form.querySelectorAll('input[name="vmq_visa[]"]');
+    
+                // Kiểm tra các trường input required có trống không
+                requiredInputs.forEach(function(input) {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                    }
+                });
+    
+                // Kiểm tra ít nhất 1 checkbox phải được chọn
+                var isChecked = Array.from(checkboxes).some(function(cb) { return cb.checked; });
+                if (!isChecked) {
+                    isValid = false;
+                }
+    
+                // Nếu không hợp lệ thì hiện prompt và dừng lại (reset nút)
+                if (!isValid) {
+                    alert("Vui lòng điền đầy đủ thông tin!");
+                    btn.disabled = false; // Kích hoạt lại nút để người dùng sửa
+                    return; // Thoát khỏi hàm, không chạy setTimeout bên dưới
+                }
+            }
             
             setTimeout(function() {
-                $form.off('submit').submit();
-            }, 1500);
-        }, 2000);
+                var modal = document.getElementById('vmq-modal-success');
+                
+                if (modal) {
+                    // Xử lý tương đương với .css('display', 'flex').hide().fadeIn()
+                    modal.style.opacity = 0;
+                    modal.style.display = 'flex';
+                    modal.style.transition = 'opacity 0.4s ease'; // 0.4s là tốc độ mặc định của fadeIn() trong jQuery
+                    
+                    // Ép trình duyệt tính toán lại layout (reflow) để transition hoạt động
+                    void modal.offsetWidth; 
+                    modal.style.opacity = 1;
+                }
+                
+                setTimeout(function() {
+                    if (form) {
+                        // Lệnh form.submit() trong JS thuần tự động bỏ qua các event listener 'submit', 
+                        // tương đương với $form.off('submit').submit() của jQuery.
+                        form.submit();
+                    }
+                }, 1500);
+                
+            }, 2000);
+        });
     });
+    
+    document.addEventListener( 'wpcf7mailsent', function( event ) {
+        // Kiểm tra xem trong phản hồi (response) từ server có chứa link redirect không
+        var response = event.detail.apiResponse;
+        
+        if ( response && response.redirect_to ) {
+            // Nếu có, thực hiện chuyển hướng ngay lập tức
+            window.location.href = response.redirect_to;
+        }
+    }, false );
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    // Sử dụng Event Delegation để bắt sự kiện submit của form
+    document.addEventListener('submit', function(e) {
+        // Kiểm tra xem element bị submit có đúng class không
+        if (e.target && e.target.classList.contains('nhut-visa-form')) {
+            e.preventDefault();
+
+            const form = e.target;
+            
+            // 1. Thu thập dữ liệu form bằng FormData API
+            const data = new FormData(form);
+            
+            // 2. Thêm các tham số action và nonce vào data
+            data.append('action', 'nhut_submit_visa_form');
+            data.append('nonce', nhutVisaForm.nonce);
+
+            // 3. Sử dụng Fetch API để gửi request
+            fetch(nhutVisaForm.ajaxUrl, {
+                method: 'POST',
+                body: data // Fetch tự động xử lý Content-Type cho FormData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(response => {
+                // Xử lý logic thành công dựa trên cấu trúc wp_send_json_success()
+                if (response.success) {
+                    window.location.href = "/thank-you/?from=tld";
+                } else {
+                    const message = (response.data && response.data.message) 
+                                    ? response.data.message 
+                                    : 'Gửi thất bại, vui lòng thử lại.';
+                    alert(message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi kết nối hệ thống.');
+            });
+        }
+    });
+});
 
 })();
 
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 VQM Fix: Neo tọa độ động theo phần tử cuối (JS Only Tuyệt Đối)");
+
+    const isMobile = () => window.innerWidth <= 768;
+
+    // Thứ tự 4 menu đơn bạn muốn hiển thị từ trên xuống dưới
+    const childIds = ['menu-item-4715', 'menu-item-1327', 'menu-item-1064', 'menu-item-4716'];
+
+    function updateMobilePositions() {
+        if (!isMobile()) return;
+
+        const mobileContainer = document.querySelector('.vmq-mobile-panel[data-tab="vmq-mobile-tab-2"]');
+        if (!mobileContainer) return;
+
+        // 1. Tìm menu cha cuối cùng trong khối Accordion (Visa Việt Nam)
+        const lastAccordion = mobileContainer.querySelector('#menu-item-67');
+        if (!lastAccordion) return;
+
+        // 2. Tính toán cạnh đáy của menu "Visa Việt Nam"
+        // offsetTop (vị trí đỉnh) + offsetHeight (chiều cao thực tế đang giãn nở)
+        const bottomOfAccordions = lastAccordion.offsetTop + lastAccordion.offsetHeight;
+
+        // 3. Thông số khoảng cách (Cố định bằng Pixel, không bao giờ bị co giãn)
+        const marginTop = 12;    // Khoảng cách từ menu "Visa VN" xuống menu "Visa du học"
+        const itemSpacing = 42;  // Khoảng cách giữa các menu đơn với nhau (Chỉnh số này nếu muốn khít/xa hơn)
+
+        let currentTop = bottomOfAccordions + marginTop;
+
+        // 4. Xếp hàng 4 menu đơn
+        childIds.forEach(id => {
+            const el = mobileContainer.querySelector('#' + id);
+            if (el) {
+                // Set chính xác vị trí px
+                el.style.setProperty('top', currentTop + 'px', 'important');
+                // Cộng dồn pixel cho item tiếp theo
+                currentTop += itemSpacing; 
+            }
+        });
+    }
+
+    // Lắng nghe click để đuổi theo hiệu ứng trượt của menu
+    document.body.addEventListener('click', function(e) {
+        if (e.target.closest('.vmq-mobile-acc-header') || e.target.closest('.vmq-mobile-accordion')) {
+            // Chạy vòng lặp cực nhanh trong 0.75s để 4 menu dưới "trượt" mượt mà theo menu trên
+            let count = 0;
+            const interval = setInterval(() => {
+                updateMobilePositions();
+                if (++count > 15) clearInterval(interval);
+            }, 50);
+        }
+    });
+
+    // Theo dõi mọi biến động trong menu
+    const targetNode = document.getElementById('vmq-mobile-menu-content');
+    if (targetNode) {
+        new MutationObserver(updateMobilePositions).observe(targetNode, { attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
+    }
+
+    // Khởi chạy
+    window.addEventListener('resize', updateMobilePositions);
+    setTimeout(updateMobilePositions, 100);
+    setTimeout(updateMobilePositions, 500);
+});

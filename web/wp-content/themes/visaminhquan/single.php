@@ -45,13 +45,6 @@ if ( $vmq_use_elementor_layout ) {
 <div class="vmq-single-post-wrapper">
 	<div class="vmq-single-post-container">
 		<div class="vmq-single-post-layout">
-			<aside class="vmq-single-post-sidebar">
-				<div class="vmq-single-post-sidebar-widget vmq-toc-widget">
-					<h3 class="vmq-single-post-sidebar-title">Mục lục bài viết</h3>
-					<nav class="vmq-toc" id="vmq-toc"></nav>
-				</div>
-			</aside><!-- .vmq-single-post-sidebar -->
-
 			<main class="vmq-single-post-main">
 				<?php
 				while ( have_posts() ) :
@@ -98,6 +91,14 @@ if ( $vmq_use_elementor_layout ) {
 
 						<?php // TOC + nội dung bài viết ?>
 						<div class="vmq-single-post-content" id="vmq-post-content">
+							<section class="vmq-inline-toc-widget" id="vmq-inline-toc-widget" hidden>
+								<button type="button" class="vmq-inline-toc-toggle" id="vmq-inline-toc-toggle" aria-expanded="false" aria-controls="vmq-toc">
+									<span class="vmq-inline-toc-toggle-label">Mục lục bài viết</span>
+									<span class="vmq-inline-toc-toggle-icon" aria-hidden="true"></span>
+								</button>
+								<nav class="vmq-toc" id="vmq-toc"></nav>
+							</section>
+
 							<?php
 							the_content();
 
@@ -180,6 +181,12 @@ if ( $vmq_use_elementor_layout ) {
 
 				<?php endwhile; ?>
 			</main><!-- .vmq-single-post-main -->
+
+			<aside class="vmq-single-post-sidebar">
+				<div class="vmq-single-post-sidebar-widget vmq-destination-guide-widget">
+					<?php echo do_shortcode( '[vmq_destination_guide]' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</div>
+			</aside><!-- .vmq-single-post-sidebar -->
 		</div><!-- .vmq-single-post-layout -->
 	</div><!-- .vmq-single-post-container -->
 </div><!-- .vmq-single-post-wrapper -->
