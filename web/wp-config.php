@@ -1,4 +1,6 @@
 <?php
+define( 'WP_CACHE', true ); // Added by WP Rocket
+
 /**
  * #ddev-generated: Automatically generated WordPress settings file.
  * ddev manages this file and may delete or overwrite the file unless this comment is removed.
@@ -14,14 +16,14 @@ define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
 /** Authentication Unique Keys and Salts. */
-define( 'AUTH_KEY', 'aaAHVKrGJWjLWyOEePznETOkqItMktRDpQOfDwuTMJRClTUNXSTsuDuiJlJSjlMG' );
-define( 'SECURE_AUTH_KEY', 'BzScpXwWOyxzlYferjYcANUZLCSTWJwPkhiALmdYjZVxkPjyTIGWQuKweiPrtuHS' );
-define( 'LOGGED_IN_KEY', 'AeMBifxGfllukhewHmDBKlHxTtXQoovZSNyINnEgKpHeUfemAhBQccwwfZajLOwa' );
-define( 'NONCE_KEY', 'nGvybfeUScBMEPyAxztMFfdWhhryRwAdUbBneMlNqrROjXRcVPbpEobYcUbvAgqW' );
-define( 'AUTH_SALT', 'CwHQNgjfYraRWGGLjwBHdhKZDRcPYCYdTlxPSSEDNBRLKYBgjRUzTrOaTbTLVjyD' );
-define( 'SECURE_AUTH_SALT', 'uDTkaVMrvoTFOzTRKrOGFulZTFXkhyiUrgcMPdautNJCEaHmncbOXaMScNfIIwmd' );
-define( 'LOGGED_IN_SALT', 'jLzmKhFFOPvdVNxhdJVdFNJzFXEhPtQKbwpVnjyvqehNVQaGDxUniAicxdtlFESf' );
-define( 'NONCE_SALT', 'CcXDPDDyqajFmeyqTeQDoZyfFVSKrXWvntWFOjzgHMdAiLcEdcdVNlkzVQBYwIRs' );
+define( 'AUTH_KEY', 'TqmjPQflXpCkgGSsFaIHFtWeDWgFgMPtEAQsVbLXwnXIHAjPEQURybTvHekZoRVT' );
+define( 'SECURE_AUTH_KEY', 'gcqiixDSphTGMgZcdXZpquNwcRKpAKoDnIkpnuebGKmnZvCqsDSXbDpZMkqkblIz' );
+define( 'LOGGED_IN_KEY', 'FeccqmOhOwWXCWHDdwflPYYxlNeRMoeupsjrLUGAuygpcqTbXXXnTnlzhGMMeftV' );
+define( 'NONCE_KEY', 'JwGnsSvveDFwuvxHzuFbCOCcBhUyMDsHSQENpMBDQKEyhffbCPRNKzqHrvDCEfBy' );
+define( 'AUTH_SALT', 'GHOyuAAQuRDGuYSwJwtZaixsqxhLRMeChoRcLGyuYSgkDFwPbBYIJvHBjqOFjwcB' );
+define( 'SECURE_AUTH_SALT', 'isuxrBejobolyjiPCigGzedDbTXXHrzHeMkpERFSjbYnVAOAgNOfgAkoYBGZgzaE' );
+define( 'LOGGED_IN_SALT', 'EOvlqnyZwEduvLQJXelvvQXFoeLJpQqduZkYvdNiINPsBzlXEEWXSRZdWstTIMSS' );
+define( 'NONCE_SALT', 'bexRlTlkypbyBbYUhqqfNqgqeYnFAkUPRColiKDKatrFICkOUgLBfmAKlyBCaRmN' );
 
 /* Add any custom values between this line and the "stop editing" line. */
 

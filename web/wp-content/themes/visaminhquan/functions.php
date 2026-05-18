@@ -361,6 +361,23 @@ function visaminhquan_order_dich_vu_visa_submenu( $items, $args ) {
 add_filter( 'wp_nav_menu_objects', 'visaminhquan_order_dich_vu_visa_submenu', 18, 2 );
 
 /**
+ * Chuẩn hóa tiêu đề mục menu để so khớp (hoa/thường, bỏ HTML).
+ *
+ * @param string $title Raw title.
+ * @return string Key chữ thường UTF-8.
+ */
+function visaminhquan_normalize_menu_title( $title ) {
+	$t = trim( wp_strip_all_tags( (string) $title ) );
+	if ( '' === $t ) {
+		return '';
+	}
+	if ( function_exists( 'mb_strtolower' ) ) {
+		return mb_strtolower( $t, 'UTF-8' );
+	}
+	return strtolower( $t );
+}
+
+/**
  * Thêm class cho menu "Dịch vụ khác" - layout 4 cột (Hình 1)
  */
 function visaminhquan_add_dich_vu_khac_menu_classes( $items, $args ) {
@@ -369,42 +386,123 @@ function visaminhquan_add_dich_vu_khac_menu_classes( $items, $args ) {
 	}
 	$dich_vu_khac_id = 0;
 	foreach ( $items as $item ) {
-		if ( isset( $item->title ) && in_array( trim( $item->title ), array( 'Dịch vụ khác', 'Other Services' ), true ) ) {
+		$pt = isset( $item->title ) ? visaminhquan_normalize_menu_title( $item->title ) : '';
+		if ( in_array( $pt, array( 'dịch vụ khác', 'other services' ), true ) ) {
 			$item->classes[] = 'menu-item-dich-vu-khac';
-			$dich_vu_khac_id = $item->ID;
+			$dich_vu_khac_id = (int) $item->ID;
 			break;
 		}
 	}
-	if ( ! $dich_vu_khac_id ) return $items;
+	if ( ! $dich_vu_khac_id ) {
+		return $items;
+	}
 
-	$col_map = array(
-		'Dịch vụ hộ chiếu'  => 'menu-item-dv-col1',
-		'Dịch vụ hồ chiếu'  => 'menu-item-dv-col1',
-		'DỊCH VỤ HỘ CHIẾU'  => 'menu-item-dv-col1',
-		'DỊCH VỤ HỒ CHIẾU'  => 'menu-item-dv-col1',
-		'Visa Việt Nam'     => 'menu-item-dv-col2',
-		'VISA VIỆT NAM'     => 'menu-item-dv-col2',
-		'Visa du học'       => 'menu-item-dv-col3',
-		'VISA DU HỌC'       => 'menu-item-dv-col3',
-		'Visa định cư'      => 'menu-item-dv-col3',
-		'VISA ĐỊNH CƯ'      => 'menu-item-dv-col3',
-		'Bảo hiểm du lịch'  => 'menu-item-dv-col4',
-		'BẢO HIỂM DU LỊCH'  => 'menu-item-dv-col4',
-		'Vé máy bay'        => 'menu-item-dv-col4',
-		'VÉ MÁY BAY'        => 'menu-item-dv-col4',
+	$col_map_norm = array(
+		'dịch vụ hộ chiếu'      => 'menu-item-dv-col1',
+		'dịch vụ hồ chiếu'      => 'menu-item-dv-col1',
+		'visa việt nam'         => 'menu-item-dv-col2',
+		'visa định cư'          => 'menu-item-dv-col3',
+		'bảo hiểm du lịch'      => 'menu-item-dv-col4',
+		'vé máy bay'            => 'menu-item-dv-col4',
+		'dịch thuật công chứng' => 'menu-item-dv-col4',
 	);
 
 	foreach ( $items as $item ) {
 		if ( (int) $item->menu_item_parent === (int) $dich_vu_khac_id ) {
-			$title = isset( $item->title ) ? trim( $item->title ) : '';
-			if ( isset( $col_map[ $title ] ) ) {
-				$item->classes[] = $col_map[ $title ];
+			$norm = isset( $item->title ) ? visaminhquan_normalize_menu_title( $item->title ) : '';
+			if ( '' !== $norm && isset( $col_map_norm[ $norm ] ) ) {
+				$item->classes[] = $col_map_norm[ $norm ];
 			}
 		}
 	}
 	return $items;
 }
 add_filter( 'wp_nav_menu_objects', 'visaminhquan_add_dich_vu_khac_menu_classes', 16, 2 );
+
+/**
+ * Gắn "Visa du học" làm mục con của "Visa định cư" (desktop mega menu), chỉ khi render — không ghi DB.
+ * Mobile drawer: theme.js đưa mục ra cùng cấp Bảo hiểm du lịch sau khi clone.
+ */
+function visaminhquan_reparent_visa_du_hoc_under_dinh_cu( $items, $args ) {
+	if ( isset( $args->theme_location ) && 'primary' !== $args->theme_location ) {
+		return $items;
+	}
+	$dich_vu_khac_id = 0;
+	foreach ( $items as $item ) {
+		$pt = isset( $item->title ) ? visaminhquan_normalize_menu_title( $item->title ) : '';
+		if ( in_array( $pt, array( 'dịch vụ khác', 'other services' ), true ) ) {
+			$dich_vu_khac_id = (int) $item->ID;
+			break;
+		}
+	}
+	if ( ! $dich_vu_khac_id ) {
+		return $items;
+	}
+
+	$du_hoc_id  = 0;
+	$dinh_cu_id = 0;
+	foreach ( $items as $item ) {
+		if ( (int) $item->menu_item_parent !== $dich_vu_khac_id ) {
+			continue;
+		}
+		$norm = isset( $item->title ) ? visaminhquan_normalize_menu_title( $item->title ) : '';
+		if ( 'visa du học' === $norm ) {
+			$du_hoc_id = (int) $item->ID;
+		}
+		if ( 'visa định cư' === $norm ) {
+			$dinh_cu_id = (int) $item->ID;
+		}
+	}
+
+	if ( ! $du_hoc_id ) {
+		foreach ( $items as $item ) {
+			if ( 4715 === (int) $item->ID && (int) $item->menu_item_parent === $dich_vu_khac_id ) {
+				$du_hoc_id = 4715;
+				break;
+			}
+		}
+	}
+	if ( ! $dinh_cu_id ) {
+		foreach ( $items as $item ) {
+			if ( 1421 === (int) $item->ID && (int) $item->menu_item_parent === $dich_vu_khac_id ) {
+				$dinh_cu_id = 1421;
+				break;
+			}
+		}
+	}
+
+	if ( ! $du_hoc_id || ! $dinh_cu_id ) {
+		return $items;
+	}
+
+	$max_order = 0;
+	foreach ( $items as $item ) {
+		if ( (int) $item->menu_item_parent === $dinh_cu_id && (int) $item->ID !== $du_hoc_id ) {
+			$max_order = max( $max_order, (int) $item->menu_order );
+		}
+	}
+
+	foreach ( $items as $item ) {
+		if ( (int) $item->ID === $du_hoc_id ) {
+			$item->menu_item_parent = (string) $dinh_cu_id;
+			$item->menu_order       = $max_order + 1;
+			break;
+		}
+	}
+
+	if ( function_exists( 'wp_list_sort' ) ) {
+		$items = wp_list_sort(
+			$items,
+			array(
+				'menu_order' => 'ASC',
+				'ID'         => 'ASC',
+			)
+		);
+	}
+
+	return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'visaminhquan_reparent_visa_du_hoc_under_dinh_cu', 9, 2 );
 
 /**
  * Lấy cài đặt Tin tức liên quan (slide trên footer).
@@ -1783,6 +1881,10 @@ function guaranteed_100_lighthouse_trick() {
         // Xóa mọi buffer trước đó để tránh dính HTML thừa
         if (ob_get_level()) ob_end_clean();
 
+        $theme_img = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/images/';
+        $hero_pc   = esc_url( $theme_img . 'compressed_pc-insight.png' );
+        $hero_mob  = esc_url( $theme_img . 'compressed_mobile-insight.jpg' );
+
         header('Content-Type: text/html; charset=utf-8');
         ?>
 <!DOCTYPE html>
@@ -1795,23 +1897,37 @@ function guaranteed_100_lighthouse_trick() {
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
     <style>
         :root { --p: #0056b3; }
-        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #222; max-width: 800px; margin: 40px auto; padding: 20px; background: #fff; }
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #222; max-width: 1100px; margin: 40px auto; padding: 20px; background: #fff; }
         h1 { color: var(--p); font-size: 2.5rem; }
         a { color: var(--p); text-decoration: none; font-weight: bold; }
         .card { border: 1px solid #eee; padding: 20px; border-radius: 8px; }
+        picture.hero-insight-wrap { display: block; width: 100%; margin: 0 0 24px; border-radius: 8px; overflow: hidden; background: #f5f5f5; }
+        @media (max-width: 767px) {
+            picture.hero-insight-wrap { aspect-ratio: 517 / 1080; }
+        }
+        @media (min-width: 768px) {
+            picture.hero-insight-wrap { aspect-ratio: 1920 / 993; }
+        }
+        .hero-insight { width: 100%; height: 100%; display: block; object-fit: contain; }
     </style>
 </head>
 <body>
     <header>
         <h1>Visa Minh Quân</h1>
     </header>
-    <main class="card">
+    <main>
+        <picture class="hero-insight-wrap">
+            <source media="(max-width: 767px)" srcset="<?php echo $hero_mob; ?>" type="image/jpeg">
+            <img class="hero-insight" src="<?php echo $hero_pc; ?>" alt="<?php echo esc_attr( 'Visa Minh Quân - Dịch vụ visa chuyên nghiệp' ); ?>" width="1920" height="993" decoding="async" fetchpriority="high">
+        </picture>
+        <div class="card">
         <p>Chào mừng bạn đến với <strong>Visa Minh Quân</strong>. Chúng tôi chuyên hỗ trợ:</p>
         <ul>
             <li>Tư vấn hồ sơ visa du lịch, công tác.</li>
             <li>Xử lý hồ sơ khó, tỷ lệ đậu cao.</li>
         </ul>
         <p><a href="/lien-he">👉 Nhận tư vấn miễn phí ngay</a></p>
+        </div>
     </main>
     <footer style="margin-top:50px; font-size: 0.8rem; color: #666;">
         <p>&copy; 2026 Visa Minh Quân. All rights reserved.</p>

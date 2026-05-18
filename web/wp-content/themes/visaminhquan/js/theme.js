@@ -32,6 +32,61 @@
         if (mobileMenuToggle) {
             mobileMenuToggle.setAttribute('aria-expanded', 'true');
         }
+        var activePanel = mobileMenuContent && mobileMenuContent.querySelector('.vmq-mobile-panel.active');
+        if (activePanel) {
+            scheduleMobileMenuLayoutReflow(activePanel);
+        }
+    }
+
+    /**
+     * Bỏ id khỏi bản clone (trùng id với #primary-menu là HTML không hợp lệ + dính CSS global theo #menu-item-*).
+     * Giữ lại ở data-vmq-menu-id để debug / style nếu cần.
+     */
+    function dedupeMobileMenuCloneIds(root) {
+        if (!root) return;
+        root.querySelectorAll('[id]').forEach(function (el) {
+            var id = el.getAttribute('id');
+            if (id) {
+                el.setAttribute('data-vmq-menu-id', id);
+                el.removeAttribute('id');
+            }
+        });
+    }
+
+    /**
+     * Xóa toàn bộ style="" do clone từ menu desktop (mega menu / column / JS) — chỉ dùng cho bản sao trong drawer mobile.
+     */
+    function stripClonedMenuInlineStyles(root) {
+        if (!root) return;
+        if (root.hasAttribute && root.hasAttribute('style')) {
+            root.removeAttribute('style');
+        }
+        root.querySelectorAll('[style]').forEach(function (el) {
+            el.removeAttribute('style');
+        });
+    }
+
+    /**
+     * Gỡ các thuộc tính inline hay gây chồng chữ sau khi mở accordion (desktop đôi khi gán qua JS).
+     * Chỉ gọi trong ngữ cảnh mobile menu.
+     */
+    function normalizeMobileMenuItemLayout(root) {
+        if (!root || window.innerWidth > 768) return;
+        var props = ['top', 'left', 'right', 'bottom', 'transform', 'position', 'z-index'];
+        root.querySelectorAll('li, ul, a, button').forEach(function (el) {
+            props.forEach(function (p) {
+                el.style.removeProperty(p);
+            });
+        });
+    }
+
+    function scheduleMobileMenuLayoutReflow(root) {
+        if (!root) return;
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                normalizeMobileMenuItemLayout(root);
+            });
+        });
     }
 
     // Accordion cho submenu trong mobile menu
@@ -61,13 +116,102 @@
             headerBtn.addEventListener('click', function () {
                 const isOpen = li.classList.toggle('is-open');
                 submenu.style.display = isOpen ? 'block' : 'none';
+                var panelRoot = li.closest('.vmq-mobile-panel') || listElement;
+                scheduleMobileMenuLayoutReflow(panelRoot);
             });
         });
+    }
+
+    /**
+     * Tab mobile "Dịch vụ khác": đưa Visa du học ra cùng cấp Bảo hiểm du lịch (desktop vẫn nằm trong Visa định cư).
+     */
+    function promoteVisaDuHocMobileDichVuKhac(list) {
+        if (!list) return;
+        var baoHiem = list.querySelector(':scope > li[data-vmq-menu-id="menu-item-1064"]');
+        var duHoc = list.querySelector('li[data-vmq-menu-id="menu-item-4715"]');
+        if (!baoHiem || !duHoc || duHoc === baoHiem) return;
+        if (duHoc.parentElement === list && duHoc.nextElementSibling === baoHiem) return;
+        list.insertBefore(duHoc, baoHiem);
+    }
+
+    /**
+     * Mega "Dịch vụ khác" cột 4: góp 3 mục vào một li + ul flex (khoảng cách nhỏ).
+     * Gỡ trước khi clone menu mobile; gắn lại khi desktop (≥769).
+     */
+    function getDichVuKhacMegaRoot() {
+        return document.querySelector('.main-navigation > ul > li.menu-item-dich-vu-khac > ul');
+    }
+
+    /** Thứ tự hiển thị cột 4: Bảo hiểm → Vé máy bay → Dịch thuật (DOM WP có thể khác). */
+    function sortCol4DichVuKhacItems(lis) {
+        var rank = { 1064: 0, 1327: 1, 4716: 2 };
+        return Array.prototype.slice.call(lis).sort(function (a, b) {
+            function mid(el) {
+                var m = el.id && el.id.match(/^menu-item-(\d+)$/);
+                return m ? parseInt(m[1], 10) : 9999;
+            }
+            var ida = mid(a);
+            var idb = mid(b);
+            var ra = Object.prototype.hasOwnProperty.call(rank, ida) ? rank[ida] : 50;
+            var rb = Object.prototype.hasOwnProperty.call(rank, idb) ? rank[idb] : 50;
+            if (ra !== rb) return ra - rb;
+            return ida - idb;
+        });
+    }
+
+    function unwrapMegaCol4DichVuKhac() {
+        var mega = getDichVuKhacMegaRoot();
+        if (!mega) return;
+        var wrap = mega.querySelector(':scope > li.vmq-mega-col4-group');
+        if (!wrap) return;
+        var inner = wrap.querySelector(':scope > ul');
+        if (!inner) return;
+        var items = Array.prototype.slice.call(inner.children).filter(function (n) {
+            return n.tagName === 'LI';
+        });
+        items = sortCol4DichVuKhacItems(items);
+        var parent = wrap.parentNode;
+        if (!parent) return;
+        items.forEach(function (li) {
+            parent.insertBefore(li, wrap);
+        });
+        parent.removeChild(wrap);
+    }
+
+    function wrapMegaCol4DichVuKhac() {
+        if (window.innerWidth < 769) return;
+        var mega = getDichVuKhacMegaRoot();
+        if (!mega || mega.querySelector(':scope > li.vmq-mega-col4-group')) return;
+        var col4 = Array.prototype.filter.call(mega.children, function (li) {
+            return li.tagName === 'LI' && li.classList.contains('menu-item-dv-col4');
+        });
+        if (col4.length !== 3) return;
+        var anchor = null;
+        for (var i = 0; i < mega.children.length; i++) {
+            var ch = mega.children[i];
+            if (ch.tagName === 'LI' && ch.classList.contains('menu-item-dv-col4')) {
+                anchor = ch;
+                break;
+            }
+        }
+        if (!anchor) return;
+        col4 = sortCol4DichVuKhacItems(col4);
+        var wrapLi = document.createElement('li');
+        wrapLi.className = 'menu-item vmq-mega-col4-group menu-item-dv-col4';
+        var innerUl = document.createElement('ul');
+        innerUl.className = 'sub-menu vmq-mega-col4-stack';
+        mega.insertBefore(wrapLi, anchor);
+        col4.forEach(function (li) {
+            innerUl.appendChild(li);
+        });
+        wrapLi.appendChild(innerUl);
     }
 
     function buildMobileMenuFromPrimary() {
         const primaryMenu = document.getElementById('primary-menu');
         if (!primaryMenu || !mobileMenuTabs || !mobileMenuContent) return;
+
+        unwrapMegaCol4DichVuKhac();
 
         // Reset containers
         mobileMenuTabs.innerHTML = '';
@@ -102,8 +246,13 @@
             if (submenu) {
                 list = submenu.cloneNode(true);
                 list.classList.add('vmq-mobile-submenu');
+                stripClonedMenuInlineStyles(list);
+                dedupeMobileMenuCloneIds(list);
                 // Thiết lập accordion cho các nhóm bên trong
                 setupMobileAccordion(list);
+                if (list.querySelector(':scope > li[data-vmq-menu-id="menu-item-1064"]')) {
+                    promoteVisaDuHocMobileDichVuKhac(list);
+                }
             } else {
                 list = document.createElement('ul');
                 list.className = 'vmq-mobile-submenu';
@@ -129,6 +278,7 @@
 
                 tabButton.classList.add('active');
                 panel.classList.add('active');
+                scheduleMobileMenuLayoutReflow(panel);
             });
         });
 
@@ -138,6 +288,11 @@
         if (firstTab && firstPanel) {
             firstTab.classList.add('active');
             firstPanel.classList.add('active');
+            scheduleMobileMenuLayoutReflow(firstPanel);
+        }
+
+        if (window.innerWidth >= 769) {
+            wrapMegaCol4DichVuKhac();
         }
     }
 
@@ -173,7 +328,26 @@
                 closeMobileMenu();
             }
         });
+    } else if (window.innerWidth >= 769) {
+        wrapMegaCol4DichVuKhac();
     }
+
+    var vmqMegaCol4Desk = window.innerWidth >= 769;
+    window.addEventListener('resize', function () {
+        var desk = window.innerWidth >= 769;
+        if (desk === vmqMegaCol4Desk) return;
+        vmqMegaCol4Desk = desk;
+        if (desk) {
+            wrapMegaCol4DichVuKhac();
+        } else {
+            unwrapMegaCol4DichVuKhac();
+        }
+        var tabs = document.getElementById('vmq-mobile-menu-tabs');
+        var content = document.getElementById('vmq-mobile-menu-content');
+        if (tabs && content && typeof buildMobileMenuFromPrimary === 'function') {
+            buildMobileMenuFromPrimary();
+        }
+    });
 
     // Auto columns for submenu based on item count
     function setupMegaMenuColumns() {
